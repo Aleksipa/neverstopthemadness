@@ -4,7 +4,7 @@
 Lukuvinkki is an app for saving books and videos you might want to refer to later on.
 
 # Motivation
-A short description of the motivation behind the creation and maintenance of the project. This should explain why the project exists.
+This app is a course work for University of Helsinki course on software production.
 
 <!---
 # Build status
