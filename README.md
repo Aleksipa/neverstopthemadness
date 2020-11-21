@@ -6,6 +6,25 @@ Lukuvinkki is an app for saving books and videos you might want to refer to late
 # Motivation
 This app is a course work for University of Helsinki course on software production.
 
+## Developing
+The project uses Pipenv for dependency management. Make sure it is installed.
+Development dependencies can be installed by running
+```
+pipenv install --dev
+```
+A shell to the created virtualenv can be started by running
+```
+pipenv shell
+```
+All following commands must be run inside the virtualenv.
+
+### Tests
+
+Tests can be run with `pytest`. To also report test coverage run
+```
+pytest --cov=application
+```
+
 <!---
 # Build status
 Build status of continus integration i.e. travis, appveyor etc. Ex. -
