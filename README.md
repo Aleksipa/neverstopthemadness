@@ -18,12 +18,10 @@ pipenv shell
 ```
 All following commands must be run inside the virtualenv.
 
-### Tests
+### Unit tests
 
-Tests can be run with `pytest`. To also report test coverage run
-```
-pytest --cov=application
-```
+Tests can be run with the script `run-tests.sh`. To also report test coverage
+pass `--cov=application` argument to `run-tests.sh`.
 
 <!---
 # Build status

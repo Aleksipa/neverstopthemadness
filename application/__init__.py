@@ -5,10 +5,14 @@ from flask_sqlalchemy import SQLAlchemy
 
 import os
 
-if os.environ.get("HEROKU"):
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+if os.environ.get("TESTING"):
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///local.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL",
+        "sqlite:///local.db",
+    )
+if not os.environ.get("HEROKU"):
     # This makes the app print all SQL-queries when ran locally
     app.config["SQLALCHEMY_ECHO"] = True
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
