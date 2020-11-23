@@ -23,6 +23,10 @@ All following commands must be run inside the virtualenv.
 Tests can be run with the script `run-tests.sh`. To also report test coverage
 pass `--cov=application` argument to `run-tests.sh`.
 
+### Feature tests
+
+Feature tests can be run with the script `run-feature-tests.sh`.
+
 <!---
 # Build status
 Build status of continus integration i.e. travis, appveyor etc. Ex. -

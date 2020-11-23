@@ -19,6 +19,7 @@ autopep8 = "==1.5.4"
 pytest = "*"
 beautifulsoup4 = "*"
 pytest-cov = "*"
+behave = "*"
 
 [requires]
 python_version = "3.6"
