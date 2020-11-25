@@ -7,9 +7,9 @@ Lukuvinkki is an app for saving books and videos you might want to refer to late
 This app is a course work for University of Helsinki course on software production.
 
 ## Progress
-Development progress can be followed at ![Product Backlog](https://docs.google.com/spreadsheets/d/1MJSoLpiMTgNUXJ85q7sGDer07GEPHYba24U61Qp2FtE/edit?usp=sharing)
+Development progress can be followed at [Product Backlog](https://docs.google.com/spreadsheets/d/1MJSoLpiMTgNUXJ85q7sGDer07GEPHYba24U61Qp2FtE/edit?usp=sharing)
 
-App can be tested at ![lukuvinkkisovellus.herokuapp.com](https://lukuvinkkisovellus.herokuapp.com/)
+App can be tested at [lukuvinkkisovellus.herokuapp.com](https://lukuvinkkisovellus.herokuapp.com/)
 
 ## Developing
 
