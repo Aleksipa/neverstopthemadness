@@ -6,7 +6,22 @@ Lukuvinkki is an app for saving books and videos you might want to refer to late
 # Motivation
 This app is a course work for University of Helsinki course on software production.
 
+## Progress
+Development progress can be followed at ![Product Backlog](https://docs.google.com/spreadsheets/d/1MJSoLpiMTgNUXJ85q7sGDer07GEPHYba24U61Qp2FtE/edit?usp=sharing)
+
+App can be tested at ![lukuvinkkisovellus.herokuapp.com](https://lukuvinkkisovellus.herokuapp.com/)
+
 ## Developing
+
+Definition of Done:
+- Code has been peer-reviewed
+- Code has unit testing
+- Code has user level testing if applicable
+- Code passes tests
+- Changes have been documented to this readme.md
+- Code has been integrated to app, and app still passes all tests
+- Code has been pushed to Heroku and is part of the accessible app
+
 The project uses Pipenv for dependency management. Make sure it is installed.
 Development dependencies can be installed by running
 ```
