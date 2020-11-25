@@ -19,7 +19,7 @@ pipenv shell
 All following commands must be run inside the virtualenv.
 
 ### Unit tests
-
+![Python package](https://github.com/Aleksipa/Lukuvinkkisovellus/workflows/Python%20package/badge.svg)
 Tests can be run with the script `run-tests.sh`. To also report test coverage
 pass `--cov=application` argument to `run-tests.sh`.
 
