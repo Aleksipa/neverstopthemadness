@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% macro entry(name, value) %}
+{% if value %}
+{{ name }}: {{ value }}<br />
+{% endif %}
+{% endmacro %}
+
+{% block body %}
+<div class="container">
+    {% for tip in tips %}
+    {% if tip.type == "Book" %}
+    <p>
+        {{ entry("Kirjoittaja", tip.author) }}
+        {{ entry("Otsikko", tip.title) }}
+        {{ entry("Tyyppi", tip.display_type()) }}
+        {{ entry("ISBN", tip.isbn) }}
+        {{ entry("Tunnisteet", tip.tags) }}
+        {{ entry("Liittyvät kurssit", tip.related_courses) }}
+    </p>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

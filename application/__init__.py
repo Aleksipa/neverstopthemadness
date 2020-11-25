@@ -20,6 +20,8 @@ if not os.environ.get("HEROKU"):
 db = SQLAlchemy(app)
 
 from application import views
-
+from application.tips import models, views
 
 db.create_all()
+
+models.Tip.insert_initial_values()
