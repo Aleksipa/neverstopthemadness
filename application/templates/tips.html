@@ -8,10 +8,10 @@
 {% endmacro %}
 
 {% block body %}
-<div class="card-deck">
+<div class="container">
     {% for tip in tips %}
     {% if tip.type == "Book" %}
-        <div class="card" style="width: 18rem;">
+        <div class="card mb-3" style="max-width: 18rem;">
             <div class="card-body">
               <h5 class="card-title">{{tip.title}}</h5>
               {{ entry("Tyyppi", tip.display_type()) }}
