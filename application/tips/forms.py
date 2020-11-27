@@ -9,9 +9,6 @@ class AddTipForm(FlaskForm):
     related_courses = StringField("Liittyvät kurssit", [Optional()])
     tags = StringField("Tunnisteet", [Optional()])
 
-    class Meta:
-        csrf = False
-
 
 class AddBookForm(AddTipForm):
     title = StringField("Otsikko", [InputRequired()])
@@ -19,6 +16,3 @@ class AddBookForm(AddTipForm):
     publication_year = IntegerField("Julkaisuvuosi", [Optional()])
     isbn = StringField("ISBN", [Optional()])
     pages = IntegerField("Sivuja", [Optional(), NumberRange(0)])
-
-    class Meta:
-        csrf = False

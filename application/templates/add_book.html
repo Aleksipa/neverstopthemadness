@@ -16,6 +16,7 @@
 {% block body %}
 <div class="container mt-2">
   <form method="POST">
+    {{ form.csrf_token }}
     {{ field_input(form.title, "Kirja")}}
     {{ field_input(form.author, "Matti Meikäläinen")}}
     {{ field_input(form.publication_year) }}
