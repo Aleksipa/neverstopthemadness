@@ -33,6 +33,13 @@ class Tip(db.Model):
             tags="Ohjelmointi, design patterns",
             related_courses="TKT20006 Ohjelmistotuotanto",
         ))
+        db.session().add(Book(
+            title="Kirja2",
+            author="Robert Martin",
+            isbn="123456",
+            tags="Ohjelmointi",
+            related_courses="TKT20006 Ohjelmistotuotanto",
+        ))
         db.session().commit()
 
     def display_type(self):

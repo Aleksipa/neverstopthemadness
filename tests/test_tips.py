@@ -13,7 +13,8 @@ def test_initial_data(client):
 def test_empty_db(client):
     db.session().query(Tip).delete()
     soup = make_soup(client.get("/tips").data)
-    assert len(soup.find(class_="container").find_all("p")) == 0
+    
+    assert soup.find(class_="card") == None
 
 
 def test_missing_field(client):
