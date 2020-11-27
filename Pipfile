@@ -13,6 +13,7 @@ MarkupSafe = "==1.1.1"
 Werkzeug = "==1.0.1"
 flask-sqlalchemy = "*"
 psycopg2 = "*"
+flask-wtf = "*"
 
 [dev-packages]
 autopep8 = "==1.5.4"
