@@ -1,4 +1,3 @@
-from os import stat
 from application import db
 
 
@@ -69,6 +68,7 @@ class Book(Tip):
     isbn = db.Column(db.Text)
     pages = db.Column(db.Integer)
 
+
 class Video(Tip):
     __tablename__ = "Video"
     __mapper_args__ = {
@@ -79,6 +79,7 @@ class Video(Tip):
     title = db.Column(db.Text, nullable=False)
     source = db.Column(db.Text, nullable=False)
     upload_date = db.Column(db.Date)
+
 
 class Audiobook(Tip):
     __tablename__ = "Audiobook"
@@ -93,3 +94,61 @@ class Audiobook(Tip):
     publication_year = db.Column(db.Integer)
     isbn = db.Column(db.Text)
     lengthInSeconds = db.Column(db.Integer)
+
+
+class ColumnDescriptor:
+    def __init__(self, display_name, models):
+        self.display_name = display_name
+        self.models = models
+
+
+column_descriptors = {
+    "comment": ColumnDescriptor(
+        display_name="Kommentti",
+        models=[Tip],
+    ),
+    "related_courses": ColumnDescriptor(
+        display_name="Liittyvät kurssit",
+        models=[Tip],
+    ),
+    "tags": ColumnDescriptor(
+        display_name="Tunnisteet",
+        models=[Tip],
+    ),
+    "title": ColumnDescriptor(
+        display_name="Otsikko",
+        models=[Book, Video, Audiobook],
+    ),
+    "author": ColumnDescriptor(
+        display_name="Kirjoittaja",
+        models=[Book, Audiobook],
+    ),
+    "publication_year": ColumnDescriptor(
+        display_name="Julkaisuvuosi",
+        models=[Book, Audiobook],
+    ),
+    "isbn": ColumnDescriptor(
+        display_name="ISBN",
+        models=[Book, Audiobook],
+    ),
+    "pages": ColumnDescriptor(
+        display_name="Sivuja",
+        models=[Book],
+    ),
+    "source": ColumnDescriptor(
+        display_name="Url",
+        models=[Video],
+    ),
+    "upload_date": ColumnDescriptor(
+        display_name="Latauspäivämäärä",
+        models=[Video],
+    ),
+    "narrator": ColumnDescriptor(
+        display_name="Kertoja",
+        models=[Audiobook]
+    ),
+    "lengthInSeconds": ColumnDescriptor(
+        display_name="Pituus",
+        models=[Audiobook]
+    ),
+}
