@@ -1,7 +1,7 @@
 import re
 
 from application import db
-from application.tips.models import Tip, Book
+from application.tips.models import Tip, Book, Video
 from tests.util import make_soup
 
 
@@ -10,11 +10,24 @@ def test_initial_data(client):
     assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
 
 
+def test_tips_render_video(client):
+    db.session().add(Video(
+        title="test video",
+        source="test source",
+        comment="test comment",
+        tags="Ohjelmointi, algoritmit"
+    ))
+    soup = make_soup(client.get("/tips").data)
+    assert "test video" in soup.text
+    assert "test source" in soup.text
+    assert "test comment" in soup.text
+    assert "Ohjelmointi, algoritmit" in soup.text
+
 def test_empty_db(client):
     db.session().query(Tip).delete()
     soup = make_soup(client.get("/tips").data)
     
-    assert soup.find(class_="card") == None
+    assert soup.find(class_="card mb-3") == None
 
 
 def test_missing_field(client):

@@ -3,23 +3,24 @@ from flask.helpers import url_for
 from werkzeug.utils import redirect
 
 from application import app, db
-from application.tips.models import Tip, Book
+from application.tips.models import Tip, Book, Video
 from application.tips.forms import AddBookForm
 
 
-@app.route("/tips/edit/tip/<book_id>", methods=["GET"])
-def edit_book(book_id):
-    book = Book.query.get(book_id)
+@app.route("/tips/edit/tip/<tip_id>", methods=["GET"])
+def edit_tip(tip_id):
     return render_template(
-        "edit_book.html",
-        book=book
+        "edit_tip.html",
+        tip=Tip.query.get(tip_id)
     )
+
+
 
 @app.route("/tips")
 def get_tips():
     return render_template(
         "tips.html",
-        tips=db.session().query(Book).all(),
+        tips=db.session().query(Tip).all(),
     )
 
 

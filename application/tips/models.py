@@ -20,6 +20,7 @@ class Tip(db.Model):
     display_types = {
         "Tip": "vinkki",
         "Book": "kirja",
+        "Video": "video"
     }
 
     @staticmethod
@@ -33,12 +34,12 @@ class Tip(db.Model):
             tags="Ohjelmointi, design patterns",
             related_courses="TKT20006 Ohjelmistotuotanto",
         ))
-        db.session().add(Book(
-            title="Kirja2",
-            author="Robert Martin",
-            isbn="123456",
-            tags="Ohjelmointi",
+        db.session().add(Video(
+            title="Merge sort algorithm",
+            source="https://www.youtube.com/watch?v=TzeBrDU-JaY",
             related_courses="TKT20006 Ohjelmistotuotanto",
+            tags="Ohjelmointi, algoritmit"
+
         ))
         db.session().commit()
 
@@ -58,3 +59,14 @@ class Book(Tip):
     publication_year = db.Column(db.Integer)
     isbn = db.Column(db.Text)
     pages = db.Column(db.Integer)
+
+class Video(Tip):
+    __tablename__ = "Video"
+    __mapper_args__ = {
+        "polymorphic_identity": "Video",
+    }
+
+    id = db.Column(db.Integer, db.ForeignKey("Tip.id"), primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+    source = db.Column(db.Text, nullable=False)
+    upload_date = db.Column(db.Date)
