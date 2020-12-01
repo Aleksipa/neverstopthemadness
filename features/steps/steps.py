@@ -1,5 +1,7 @@
 from behave import *
 
+from application import db
+from application.tips.models import Tip, Book, Video
 from tests.util import make_soup
 
 
@@ -9,7 +11,19 @@ def step_impl(context):
 
 @when("käyttäjä avaa sivun kirjan lisäämiselle")
 def open_add_book(context):
-    context.response = context.client.get("add-book")
+    context.response = context.client.get("/tips/add-book")
+
+@when("käyttäjä avaa vinkkilista sivun")
+def open_tips(context):
+    context.response = context.client.get("/tips")
+
+@then("käyttäjä näkee vinkkilistan")
+def user_sees_list(context):
+     soup = make_soup(context.response.data)
+     
+     assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
+     assert "Merge sort algorithm" in soup.text
+     assert 2 == len(soup.findAll(class_="card mb-3"))
 
 
 @then("käyttäjä näkee staattisen vinkkilistan")
