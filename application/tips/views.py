@@ -4,7 +4,7 @@ from werkzeug.utils import redirect
 
 from application import app, db
 from application.tips.models import Tip, Book, Video
-from application.tips.forms import AddBookForm
+from application.tips.forms import AddBookForm, AddVideoForm
 
 
 @app.route("/tips/edit/tip/<tip_id>", methods=["GET"])
@@ -41,3 +41,20 @@ def add_book():
         db.session().commit()
         return redirect(url_for("get_tips"))
     return render_template("add_book.html", form=form)
+
+@app.route("/tips/add-video", methods=["GET", "POST"])
+def add_video():
+    form = AddVideoForm()
+
+    if form.validate_on_submit():
+        db.session().add(Video(
+            comment=form.comment.data,
+            related_courses=form.related_courses.data,
+            tags=form.tags.data,
+            title=form.title.data,
+            source=form.source.data,
+            upload_date=form.upload_date.data
+        ))
+        db.session().commit()
+        return redirect(url_for("get_tips"))
+    return render_template("add_video.html", form=form)

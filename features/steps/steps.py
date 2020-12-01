@@ -13,9 +13,39 @@ def step_impl(context):
 def open_add_book(context):
     context.response = context.client.get("/tips/add-book")
 
+@when("käyttäjä avaa sivun videon lisäämiselle")
+def open_add_book(context):
+    path = "/tips/add-video"
+    context.response = context.client.get(path)
+
+@when("käyttäjä täyttää video lomakkeen oikein")
+def user_fills_video_form_correctly(context):
+    context.path = "/tips/add-video"
+    context.form_data = {
+        "title": "new video",
+        "source": "www.test.com",
+        "upload_date": '2020-12-01',
+        "comment": "test comment"
+    }
+
+@when("käyttäjä täyttää video lomakkeen väärin")
+def user_fills_video_form_wrong(context):
+    context.path = "/tips/add-video"
+    context.form_data = {
+        "title": "test shouldnt exist",
+        "upload_date": '2020-12-01',
+        "comment": "test comment"
+    }
+
+@when("käyttäjä lähettää lomakkeen")
+def user_sends_form(context):
+    context.response = context.client.post(context.path, data=context.form_data)
+
+
 @when("käyttäjä avaa vinkkilista sivun")
 def open_tips(context):
     context.response = context.client.get("/tips")
+
 
 @then("käyttäjä näkee vinkkilistan")
 def user_sees_list(context):
@@ -33,11 +63,11 @@ def step_impl(context):
     assert "Otsikko: Merge sort algorithm" in page
     assert "Otsikko: Consistency models" in page
 
-@then("käyttäjä näkee oikeanlaisen formin")
+@then("käyttäjä näkee oikeanlaisen kirja formin")
 def form_is_right(context):
     page = make_soup(context.response.data)
 
-    assert 5 == len(page.find_all('input'))
+    assert 6 == len(page.find_all('input'))
     assert 1 == len(page.find_all('textarea'))
     assert "Otsikko" in page.text
     assert "Kirjailija" in page.text
@@ -45,3 +75,33 @@ def form_is_right(context):
     assert "ISBN" in page.text
     assert "Sivuja" in page.text
     assert "Oma kommentti" in page.text
+
+@then("käyttäjä näkee oikeanlaisen video formin")
+def form_is_right(context):
+    page = make_soup(context.response.data)
+
+    assert 5 == len(page.find_all('input'))
+    assert 1 == len(page.find_all('textarea'))
+    assert "Otsikko" in page.text
+    assert "Ladattu" in page.text
+    assert "URL" in page.text
+    assert "Liittyvät kurssit" in page.text
+    assert "Tunnisteet" in page.text
+    assert "Oma kommentti" in page.text
+
+@then("video lisätään vinkkeihin")
+def tip_is_added_to_list(context):
+    videos = Video.query.filter_by(title=context.form_data['title']).all()
+
+    assert len(videos) == 1
+    new_video = videos[0]
+    assert new_video.title == context.form_data['title']
+    assert new_video.source == context.form_data['source']
+    assert new_video.comment == context.form_data['comment']
+
+@then("videota ei lisätä vinkkeihin")
+def tip_is_not_added_to_list(context):
+    videos = Video.query.filter_by(title=context.form_data['title']).all()
+
+    assert len(videos) == 0
+    

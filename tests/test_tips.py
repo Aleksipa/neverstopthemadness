@@ -57,7 +57,7 @@ def test_missing_field(client):
     assert "ISBN" not in test_book.text
 
 
-def test_missing_mandatory_field(client):
+def test_missing_mandatory_field_book(client):
     resp = client.post("/tips/add-book", data={
         "title": "new book",
         "publication_year": 2020,
@@ -68,7 +68,7 @@ def test_missing_mandatory_field(client):
     assert Book.query.filter_by(title="new book").count() == 0
 
 
-def test_successful_post(client):
+def test_successful_post_book(client):
     resp = client.post("/tips/add-book", data={
         "title": "new book",
         "author": "some author",
@@ -85,3 +85,26 @@ def test_successful_post(client):
     assert new_book[0].comment == ""
     assert new_book[0].related_courses == ""
     assert new_book[0].tags == ""
+
+
+def test_missing_mandatory_field_video(client):
+    resp = client.post("/tips/add-video", data={
+        "title": "test title",
+    })
+    soup = make_soup(resp.data)
+    source = soup.find(attrs={"id": "source"}).parent
+    assert "This field is required" in source.text
+    assert Video.query.filter_by(title="test title").count() == 0
+
+def test_successful_post_video(client):
+    resp = client.post("/tips/add-video", data={
+        "title": "new video",
+        "source": "www.test.com",
+        "upload_date": '2020-12-01',
+        "comment": "test comment"
+    })
+    assert resp.status_code == 302
+    new_video = Video.query.filter_by(title="new video", source="www.test.com", upload_date='2020-12-01').all()
+    assert len(new_video) == 1
+    assert new_video[0].comment == 'test comment'
+    assert new_video[0].related_courses == ''

@@ -17,13 +17,12 @@
 <div class="container mt-2">
   <form method="POST">
     {{ form.csrf_token }}
-    {{ field_input(form.title, "Kirja")}}
-    {{ field_input(form.author, "Matti Meikäläinen")}}
-    {{ field_input(form.publication_year) }}
-    {{ field_input(form.isbn) }}
-    {{ field_input(form.pages, "") }}
+    {{ field_input(form.title, "Otsikko")}}
+    {{ field_input(form.upload_date) }}
+    {{ field_input(form.source, "www.google.com") }}
     {{ field_input(form.comment, "") }}
     {{ field_input(form.tags, "") }}
+    {{ field_input(form.related_courses)}}
     <button type="submit" class="btn btn-primary">Luo</button>
   </form>
 </div>
