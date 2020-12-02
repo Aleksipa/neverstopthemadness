@@ -11,6 +11,8 @@ Development progress can be followed at [Product Backlog](https://docs.google.co
 
 App can be tested at [lukuvinkkisovellus.herokuapp.com](https://lukuvinkkisovellus.herokuapp.com/)
 
+Test coverage report can be found [here](https://codecov.io/gh/Aleksipa/Lukuvinkkisovellus).
+
 ## Developing
 
 Definition of Done:
