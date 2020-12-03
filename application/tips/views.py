@@ -60,7 +60,7 @@ def add_video():
     return render_template("add_video.html", form=form)
 
 @app.route("/tips/add-audiobook", methods=["GET", "POST"])
-def add_video():
+def add_audiobook():
     form = AddAudiobookForm()
 
     if form.validate_on_submit():
