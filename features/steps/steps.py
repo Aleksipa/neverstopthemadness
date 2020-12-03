@@ -2,8 +2,12 @@ from behave import *
 
 from application import db
 from application.tips.models import Tip, Book, Video
-from tests.util import make_soup
+from tests.util import make_soup, reset_database
 
+
+@given("että ollaan lähtötilanteessa")
+def step_impl(context):
+    reset_database()
 
 @when("käyttäjä avaa etusivun")
 def step_impl(context):
@@ -104,4 +108,27 @@ def tip_is_not_added_to_list(context):
     videos = Video.query.filter_by(title=context.form_data['title']).all()
 
     assert len(videos) == 0
-    
+
+
+@when("käyttäjä avaa vinkkisivun")
+def step_impl(context):
+    context.response = context.client.get("/tips")
+
+
+@when('hakee ehdon "{filter}" arvolla "{value}"')
+def step_impl(context, filter, value):
+    context.response = context.client.get(f"/tips?{filter}={value}")
+
+
+@then('ainoastaan vinkki "{text}" näkyy')
+def step_impl(context, text):
+    page = make_soup(context.response.data)
+    cards = page.findAll(class_="card-body")
+    assert len(cards) == 1
+    assert text in cards[0].text
+
+
+@then("kaikki vinkit näkyvät")
+def step_impl(context):
+    page = make_soup(context.response.data)
+    assert len(page.find_all(class_="card-body")) == 3

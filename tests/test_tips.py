@@ -1,11 +1,15 @@
+from inspect import cleandoc
 import re
+
+from bs4.element import ResultSet
 
 from application import db
 from application.tips.models import Tip, Book, Video
-from tests.util import make_soup
+from tests.util import make_soup, reset_database
 
 
 def test_initial_data(client):
+    reset_database()
     soup = make_soup(client.get("/tips").data)
     assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
 
@@ -108,3 +112,25 @@ def test_successful_post_video(client):
     assert len(new_video) == 1
     assert new_video[0].comment == 'test comment'
     assert new_video[0].related_courses == ''
+
+
+def test_empty_search(client):
+    reset_database()
+    soup = make_soup(client.get("/tips").data)
+    assert len(soup.find_all(class_="card-body")) == 3
+    assert soup.find(string=re.compile("Poista rajaukset")) is None
+
+
+def test_search_single_field(client):
+    reset_database()
+    soup = make_soup(client.get("/tips?title=sort").data)
+    card = soup.find(class_="card-body")
+    assert card is not None
+    assert "Merge sort algorithm" in card.text
+    assert soup.find(string=re.compile("Poista rajaukset")) is not None
+
+
+def test_search_invalid_field(client):
+    reset_database()
+    soup = make_soup(client.get("/tips?asdasd=asd").data)
+    assert soup.find(class_="card-body") is None
