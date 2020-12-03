@@ -22,7 +22,11 @@
             {{ entry("Tunnisteet", tip.tags) }}
             {{ entry("Liittyvät kurssit", tip.related_courses) }}
             {{ entry ("Kommentti", tip.comment)}}
-            <a href="{{ url_for('edit_tip', tip_id=tip.id) }}" class="card-link">Muokkaa tai poista</a>
+            <td>
+                <form method="DELETE" action="{{ url_for('tips_remove', tip_id = tip.id) }}">
+                  <input type="submit" value="Poista"/>
+                </form>
+            </td>
               
     {% endif %}
     {% if tip.type == "Video" %}
@@ -36,7 +40,11 @@
             {{ entry("Tunnisteet", tip.tags) }}
             {{ entry("Liittyvät kurssit", tip.related_courses) }}
             {{ entry ("Kommentti", tip.comment)}}
-            <a href="{{ url_for('edit_tip', tip_id=tip.id) }}" class="card-link">Muokkaa tai poista</a>
+            <td>
+                <form method="DELETE" action="{{ url_for('tips_remove', tip_id = tip.id) }}">
+                  <input type="submit" value="Poista"/>
+                </form>
+            </td>
               
     {% endif %}
 

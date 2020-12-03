@@ -60,7 +60,7 @@ def add_video():
     return render_template("add_video.html", form=form)
 
 @app.route("/tips/add-audiobook", methods=["GET", "POST"])
-def add_video():
+def AddAudiobookForm():
     form = AddAudiobookForm()
 
     if form.validate_on_submit():
@@ -83,3 +83,13 @@ def add_video():
 def add():
 
     return render_template("add_tip.html")
+
+@app.route("/tips_remove/<tip_id>/", methods=["DELETE", "GET"])
+def tips_remove(tip_id):
+
+    tip_to_delete = Tip.query.get_or_404(tip_id)
+
+    db.session().delete(tip_to_delete)
+    db.session().commit()
+
+    return redirect(url_for("get_tips"))
