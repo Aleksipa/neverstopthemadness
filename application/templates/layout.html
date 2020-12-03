@@ -10,7 +10,7 @@
 
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
-      <a class="navbar-brand" href="/">Lukuvinkit</a>
+      <a class="navbar-brand" href="/">Lukuvinkkisovellus</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse"
         data-target="#navbar-items">
         <span class="navbar-toggler-icon"></span>
@@ -18,7 +18,13 @@
       <div class="collapse navbar-collapse" id="navbar-items">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Etusivu</a>
+            <a class="nav-link" href="{{ url_for('index') }}">Etusivu</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('get_tips') }}">Vinkit</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('add') }}">Lisää vinkki</a>
           </li>
         </ul>
       </div>

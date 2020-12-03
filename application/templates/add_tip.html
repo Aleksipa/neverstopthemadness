@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+
+
+{% block body %}
+
+<div class="container">
+    
+    <h1>Minkä vinkin haluat lisätä?</h1>
+
+    <a href="{{ url_for('add_book') }}" class="btn btn-primary" role="button">Kirja</a>
+    <a href="{{ url_for('add_video') }}" class="btn btn-primary" role="button">Video</a>
+
+</div>
+
+{% endblock %}

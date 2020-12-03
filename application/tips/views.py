@@ -58,3 +58,8 @@ def add_video():
         db.session().commit()
         return redirect(url_for("get_tips"))
     return render_template("add_video.html", form=form)
+
+@app.route("/tips/add", methods=["GET"])
+def add():
+
+    return render_template("add_tip.html")
