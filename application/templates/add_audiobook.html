@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% macro field_input(field, placeholder=None) %}
+<div class="form-group">
+  {{ field.label }}
+  {{ field(
+    class_="form-control",
+    placeholder=field.label.text if placeholder == None else placeholder,
+  )}}
+  {% for error in field.errors %}
+  <small class="form-text text-muted text-danger">{{ error }}</small>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% block body %}
+<div class="container mt-2">
+  <h1>Kirja</h1>
+  <form method="POST">
+    {{ form.csrf_token }}
+    {{ field_input(form.title, "Kirja")}}
+    {{ field_input(form.author, "Matti Meikäläinen")}}
+    {{ field_input(form.narrator, "Minna Meikäläinen")}}
+    {{ field_input(form.publication_year) }}
+    {{ field_input(form.isbn) }}
+    {{ field_input(form.length, "") }}
+    {{ field_input(form.comment, "") }}
+    {{ field_input(form.tags, "") }}
+    <button type="submit" class="btn btn-primary">Luo</button>
+  </form>
+</div>
+{% endblock %}

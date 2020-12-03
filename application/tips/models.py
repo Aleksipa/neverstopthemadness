@@ -20,7 +20,8 @@ class Tip(db.Model):
     display_types = {
         "Tip": "vinkki",
         "Book": "kirja",
-        "Video": "video"
+        "Video": "video",
+        "Audiobook": "äänikirja"
     }
 
     @staticmethod
@@ -40,6 +41,14 @@ class Tip(db.Model):
             related_courses="TKT20006 Ohjelmistotuotanto",
             tags="Ohjelmointi, algoritmit"
 
+        ))
+        db.session().add(Audiobook(
+            title="Python Programming: The Ultimate Beginner's Guide to Master Python Programming Step by Step with Practical Exercices",
+            author="Charles Walker",
+            narrator="Russell Newton",
+            publication_year=2020,
+            tags="Ohjelmointi, python",
+            lengthInSeconds=12180
         ))
         db.session().commit()
 
@@ -70,3 +79,17 @@ class Video(Tip):
     title = db.Column(db.Text, nullable=False)
     source = db.Column(db.Text, nullable=False)
     upload_date = db.Column(db.Date)
+
+class Audiobook(Tip):
+    __tablename__ = "Audiobook"
+    __mapper_args__ = {
+        "polymorphic_identity": "Audiobook",
+    }
+
+    id = db.Column(db.Integer, db.ForeignKey("Tip.id"), primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+    author = db.Column(db.Text, nullable=False)
+    narrator = db.Column(db.Text)
+    publication_year = db.Column(db.Integer)
+    isbn = db.Column(db.Text)
+    lengthInSeconds = db.Column(db.Integer)

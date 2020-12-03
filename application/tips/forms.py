@@ -25,3 +25,11 @@ class AddVideoForm(AddTipForm):
     title = StringField("Otsikko", [InputRequired()])
     source = StringField("URL", [InputRequired()])
     upload_date = DateField("Ladattu", [Optional()])
+
+class AddAudiobookForm(AddTipForm):
+    title = StringField("Otsikko", [InputRequired()])
+    author = StringField("Kirjailija", [InputRequired()])
+    narrator = StringField("Lukija", [Optional()])
+    publication_year = IntegerField("Julkaisuvuosi", [Optional()])
+    isbn = StringField("ISBN", [Optional()])
+    lengthInSeconds = IntegerField("Pituus", [Optional(), NumberRange(0)])

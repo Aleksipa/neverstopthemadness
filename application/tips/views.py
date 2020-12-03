@@ -59,6 +59,26 @@ def add_video():
         return redirect(url_for("get_tips"))
     return render_template("add_video.html", form=form)
 
+@app.route("/tips/add-audiobook", methods=["GET", "POST"])
+def add_video():
+    form = AddAudiobookForm()
+
+    if form.validate_on_submit():
+        db.session().add(Audiobook(
+            comment=form.comment.data,
+            related_courses=form.related_courses.data,
+            tags=form.tags.data,
+            title=form.title.data,
+            author=form.author.data,
+            narrator=form.narrator.data,
+            publication_year=form.publication_year.data,
+            isbn=form.isbn.data,
+            lengthInSeconds=form.length.data
+        ))
+        db.session().commit()
+        return redirect(url_for("get_tips"))
+    return render_template("add_audiobook.html", form=form)
+
 @app.route("/tips/add", methods=["GET"])
 def add():
 
