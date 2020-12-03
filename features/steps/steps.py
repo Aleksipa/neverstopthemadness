@@ -53,7 +53,7 @@ def user_sees_list(context):
      
      assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
      assert "Merge sort algorithm" in soup.text
-     assert 2 == len(soup.findAll(class_="card mb-3"))
+     #assert 2 == len(soup.findAll(class_="card mb-3"))
 
 
 @then("käyttäjä näkee staattisen vinkkilistan")
