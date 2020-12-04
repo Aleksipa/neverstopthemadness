@@ -50,6 +50,15 @@ def user_sends_form(context):
 def open_tips(context):
     context.response = context.client.get("/tips")
 
+@when("käyttäjä poistaa vinkin")
+def tips_remove(context):
+    allTips = Tip.query.all()
+    context.response = context.client.delete("/tips_remove/allTips[0]['id']")
+
+@then("käyttäjä näkee vinkkilistan, josta on poistettu yksi vinkki")
+def user_sees_list(context):
+    page = make_soup(context.response.data)
+    assert len(page.find_all(class_="card-body")) == 2
 
 @then("käyttäjä näkee vinkkilistan")
 def user_sees_list(context):
