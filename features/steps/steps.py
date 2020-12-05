@@ -45,6 +45,14 @@ def user_fills_video_form_wrong(context):
 def user_sends_form(context):
     context.response = context.client.post(context.path, data=context.form_data)
 
+@when("käyttäjä vaihtaa vinkin luettu statusta")
+def user_(context):
+    tips = Tip.query.all()
+    firstId = str(tips[0].id)
+    path = '/tips/change_read/' + firstId
+    context.response = context.client.post(path)
+    context.id = firstId
+
 
 @when("käyttäjä avaa vinkkilista sivun")
 def open_tips(context):
@@ -53,12 +61,13 @@ def open_tips(context):
 @when("käyttäjä poistaa vinkin")
 def tips_remove(context):
     allTips = Tip.query.all()
-    context.response = context.client.delete("/tips_remove/allTips[0]['id']")
+    path = "/tips_remove/" + str(allTips[0].id)
+    context.response = context.client.delete(path)
 
 @then("käyttäjä näkee vinkkilistan, josta on poistettu yksi vinkki")
 def user_sees_list(context):
     allTipsAfterDelete = Tip.query.all()
-    assert len(allTipsAfterDelete) == 4
+    assert len(allTipsAfterDelete) == 2
 
 @then("käyttäjä näkee vinkkilistan")
 def user_sees_list(context):
@@ -66,6 +75,22 @@ def user_sees_list(context):
      
      assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
      assert "Merge sort algorithm" in soup.text
+
+@then("käyttäjä näkee vinkkilistan, jossa vinkki on merkitty luetuksi")
+def user_sees_that_tip_is_read(context):
+     
+     resp = context.client.get("/tips")
+     soup = make_soup(resp.data)
+     tip = soup.find(id=context.id)
+     assert "Kyllä" in soup.text
+
+@then("käyttäjä näkee vinkkilistan, jossa vinkki on merkitty lukemattomaksi")
+def user_sees_that_tip_is_read(context):
+     
+     resp = context.client.get("/tips")
+     soup = make_soup(resp.data)
+     tip = soup.find(id=context.id)
+     assert "Ei" in soup.text
 
 
 @then("käyttäjä näkee staattisen vinkkilistan")

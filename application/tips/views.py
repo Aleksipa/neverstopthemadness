@@ -1,5 +1,6 @@
 from flask import render_template, request, abort
 from flask.helpers import url_for
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from sqlalchemy import func
 from sqlalchemy.sql.expression import true
@@ -54,6 +55,7 @@ def search_query(fields):
 def get_tips():
     # The following is a hack and will be replaced by a proper solution that
     # works with multiple search filters.
+    form = FlaskForm()
     selected_field = ""
     selected_value = ""
     search_fields = list(request.args.items())
@@ -70,6 +72,7 @@ def get_tips():
         tips = Tip.query.all()
     return render_template(
         "tips.html",
+        form=form,
         tips=tips,
         search_fields=search_criteria_fields,
         selected_attribute=lambda x: "selected" if x == selected_field else "",
@@ -138,7 +141,7 @@ def add():
 
     return render_template("add_tip.html")
 
-@app.route("/tips_remove/<tip_id>/", methods=["DELETE", "GET"])
+@app.route("/tips_remove/<tip_id>", methods=["DELETE", "GET"])
 def tips_remove(tip_id):
 
     tip_to_delete = Tip.query.get_or_404(tip_id)
@@ -146,4 +149,13 @@ def tips_remove(tip_id):
     db.session().delete(tip_to_delete)
     db.session().commit()
 
+    return redirect(url_for("get_tips"))
+
+@app.route("/tips/change_read/<tip_id>", methods=["POST"])
+def tips_change_read(tip_id):
+
+    tip = Tip.query.get_or_404(tip_id)
+
+    tip.read = not tip.read
+    db.session().commit()
     return redirect(url_for("get_tips"))

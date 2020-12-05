@@ -7,6 +7,13 @@
 {% endif %}
 {% endmacro %}
 
+{% macro read(name, value) %}
+{% if value %}
+<h6 class="card-subtitle mb-2 text-muted">{{name}}</h6>
+<p class="card-text">{{ value }}</p>
+{% endif %}
+{% endmacro %}
+
 {% block body %}
 <script>
     function onSubmit(e) {
@@ -44,42 +51,61 @@
     {% endif %}
 </form>
 {% for tip in tips %}
-<div class="card my-3" style="max-width: 18rem;">
+<div id="{{tip.id}}" class="card my-3" style="max-width: 18rem;">
     <div class="card-body">
+    <h5 class="card-title">{{tip.title}}</h5>
+    {{ entry("Tyyppi", tip.display_type()) }}
     {% if tip.type == "Book" %}
 
-            <h5 class="card-title">{{tip.title}}</h5>
-            {{ entry("Tyyppi", tip.display_type()) }}
-            {{ entry("Kirjoittaja", tip.author) }}
-            {{ entry("ISBN", tip.isbn) }}
-            {{ entry("Tunnisteet", tip.tags) }}
-            {{ entry("Liittyvät kurssit", tip.related_courses) }}
-            {{ entry ("Kommentti", tip.comment)}}
-            <td>
-                <form method="DELETE" action="{{ url_for('tips_remove', tip_id = tip.id) }}">
-                  <input type="submit" value="Poista"/>
-                </form>
-            </td>
+        {{ entry("Kirjoittaja", tip.author) }}
+        {{ entry("ISBN", tip.isbn) }}
+        {{ entry("Julkaisuvuosi", tip.publication_year)}}
+        {{ entry("Sivuja", tip.pages)}}
               
     {% endif %}
     {% if tip.type == "Video" %}
         
-            <h5 class="card-title">{{tip.title}}</h5>
-            {{ entry("Tyyppi", tip.display_type()) }}
             <h6 class="card-subtitle mb-2 text-muted">Url</h6>
             <p>
                 <a href="{{ tip.source }}" class="card-text">{{ tip.source }}</a>
             </p>
-            {{ entry("Tunnisteet", tip.tags) }}
-            {{ entry("Liittyvät kurssit", tip.related_courses) }}
-            {{ entry ("Kommentti", tip.comment)}}
-            <td>
-                <form method="DELETE" action="{{ url_for('tips_remove', tip_id = tip.id) }}">
-                  <input type="submit" value="Poista"/>
-                </form>
-            </td>
+            
+            {{ entry("Julkaistu", tip.upload_date)}}
+            
               
     {% endif %}
+    {% if tip.type == "Audiobook" %}
+        
+        {{ entry("Kirjoittaja", tip.author)}}
+        {{ entry("Lukija", tip.narrator)}}
+        {{ entry("Kesto", tip.lengthInSeconds)}}
+        {{ entry("Julkaisuvuosi", tip.publication_year)}}
+        {{ entry("ISBN", tip.isbn)}}
+            
+              
+    {% endif %}
+    {{ entry("Tunnisteet", tip.tags) }}
+    {{ entry("Liittyvät kurssit", tip.related_courses) }}
+    {{ entry ("Kommentti", tip.comment)}}
+
+    <h6 class="card-subtitle mb-2 text-muted">Luettu</h6>
+    <p class="card-text">{{ tip.display_read() }}
+        <form action="{{ url_for('tips_change_read', tip_id = tip.id) }}" method="post">
+            {{ form.csrf_token }}
+            <button class="btn btn-primary mr-3" type="submit">
+                {% if tip.read %}
+                Merkitse lukemattomaksi
+                {% else %}
+                Merkitse luetuksi
+                {% endif %}</button>
+        </form>
+    </p>
+
+    <form method="DELETE" action="{{ url_for('tips_remove', tip_id = tip.id) }}">
+        <button class="btn btn-danger mr-3" type="submit">Poista</button>
+    </form>
+
+
     </div>
 </div>
 {% endfor %}

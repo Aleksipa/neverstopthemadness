@@ -8,6 +8,7 @@ class Tip(db.Model):
     comment = db.Column(db.Text)
     related_courses = db.Column(db.Text)
     tags = db.Column(db.Text)
+    read = db.Column(db.Boolean, default=False)
     visible = db.Column(db.Boolean, default=True)
     type = db.Column(db.Text)
 
@@ -53,6 +54,10 @@ class Tip(db.Model):
 
     def display_type(self):
         return Tip.display_types[self.type]
+    def display_read(self):
+        if self.read: 
+            return "Kyllä"
+        return "Ei"
 
 
 class Book(Tip):
