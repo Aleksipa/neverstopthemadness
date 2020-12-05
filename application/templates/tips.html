@@ -106,7 +106,7 @@
         <button class="btn btn-danger mr-3" type="submit">Poista</button>
     </form>
     <p></p>
-    {% if tip.type == "Book" %}
+    {% if tip.type == "Book" or tip.type == "Video" %}
 
         <form action="{{ url_for('tips_editform', tip_id = tip.id) }}">
             <button class="btn btn-primary" type="submit">Muokkaa</button>
