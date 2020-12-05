@@ -147,3 +147,33 @@ def tips_remove(tip_id):
     db.session().commit()
 
     return redirect(url_for("get_tips"))
+
+@app.route("/tips/edit/<tip_id>/", methods=["GET"])
+def tips_editform(tip_id):
+
+    tip_to_edit = Tip.query.get_or_404(tip_id)
+
+    form=AddBookForm(formdata=request.form, obj=tip_to_edit)
+
+    return render_template("edit_book.html", form = form, tip_id = tip_id)
+
+@app.route("/tips/edit/<tip_id>/", methods=["POST"])
+def edit_book_tip(tip_id):
+
+    tip_to_edit = Tip.query.get_or_404(tip_id)
+
+    form=AddBookForm(formdata=request.form, obj=tip_to_edit)
+
+    if form.validate_on_submit():
+        tip_to_edit.comment = form.comment.data
+        tip_to_edit.related_courses=form.related_courses.data
+        tip_to_edit.tags=form.tags.data
+        tip_to_edit.title=form.title.data
+        tip_to_edit.author=form.author.data
+        tip_to_edit.publication_year=form.publication_year.data
+        tip_to_edit.isbn=form.isbn.data
+        tip_to_edit.pages=form.pages.data
+        
+        db.session().commit()
+        return redirect(url_for("get_tips"))
+    return render_template("edit_book.html", form=form)

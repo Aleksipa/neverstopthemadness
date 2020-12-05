@@ -60,6 +60,11 @@
                   <input type="submit" value="Poista"/>
                 </form>
             </td>
+            <td>
+                <form method="GET" action="{{ url_for('tips_editform', tip_id = tip.id) }}">
+                  <input type="submit" value="Muokkaa"/>
+                </form>
+            </td>
               
     {% endif %}
     {% if tip.type == "Video" %}
@@ -76,6 +81,11 @@
             <td>
                 <form method="DELETE" action="{{ url_for('tips_remove', tip_id = tip.id) }}">
                   <input type="submit" value="Poista"/>
+                </form>
+            </td>
+            <td>
+                <form method="GET" action="{{ url_for('tips_editform', tip_id = tip.id) }}">
+                  <input type="submit" value="Muokkaa"/>
                 </form>
             </td>
               

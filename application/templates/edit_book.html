@@ -15,7 +15,7 @@
 
 {% block body %}
 <div class="container mt-2">
-  <h1>Kirja</h1>
+  <h1>Kirjan muokkaus</h1>
   <form method="POST">
     {{ form.csrf_token }}
     {{ field_input(form.title, "Kirja")}}
@@ -25,7 +25,7 @@
     {{ field_input(form.pages, "") }}
     {{ field_input(form.comment, "") }}
     {{ field_input(form.tags, "") }}
-    <button type="submit" class="btn btn-primary">Luo</button>
+    <button type="submit" class="btn btn-primary">Tallenna</button>
   </form>
 </div>
 {% endblock %}
