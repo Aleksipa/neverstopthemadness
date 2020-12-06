@@ -10,7 +10,7 @@ from tests.util import make_soup, reset_database
 
 def test_initial_data(client):
     reset_database()
-    soup = make_soup(client.get("/tips").data)
+    soup = make_soup(client.get("/").data)
     assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
 
 
@@ -21,7 +21,7 @@ def test_tips_render_video(client):
         comment="test comment",
         tags="Ohjelmointi, algoritmit"
     ))
-    soup = make_soup(client.get("/tips").data)
+    soup = make_soup(client.get("/").data)
     assert "test video" in soup.text
     assert "test source" in soup.text
     assert "test comment" in soup.text
@@ -34,7 +34,7 @@ def test_edit_or_delete_button_exists(client):
         comment="test comment",
         tags="Ohjelmointi, algoritmit"
     ))
-    soup = make_soup(client.get("/tips").data)
+    soup = make_soup(client.get("/").data)
     links = soup.findAll('td')
     exists = False
     for link in links:
@@ -45,7 +45,7 @@ def test_edit_or_delete_button_exists(client):
 
 def test_empty_db(client):
     db.session().query(Tip).delete()
-    soup = make_soup(client.get("/tips").data)
+    soup = make_soup(client.get("/").data)
     
     assert soup.find(class_="card mb-3") == None
 
@@ -55,7 +55,7 @@ def test_missing_field(client):
         title="test title",
         author="test author",
     ))
-    soup = make_soup(client.get("/tips").data)
+    soup = make_soup(client.get("/").data)
     test_book = soup.find(string=re.compile("test title")).parent
     assert "ISBN" not in test_book.text
 
@@ -115,14 +115,14 @@ def test_successful_post_video(client):
 
 def test_empty_search(client):
     reset_database()
-    soup = make_soup(client.get("/tips").data)
+    soup = make_soup(client.get("/").data)
     assert len(soup.find_all(class_="card-body")) == 3
     assert soup.find(string=re.compile("Poista rajaukset")) is None
 
 
 def test_search_single_field(client):
     reset_database()
-    soup = make_soup(client.get("/tips?title=sort").data)
+    soup = make_soup(client.get("/?title=sort").data)
     card = soup.find(class_="card-body")
     assert card is not None
     assert "Merge sort algorithm" in card.text
@@ -131,5 +131,5 @@ def test_search_single_field(client):
 
 def test_search_invalid_field(client):
     reset_database()
-    soup = make_soup(client.get("/tips?asdasd=asd").data)
+    soup = make_soup(client.get("/?asdasd=asd").data)
     assert soup.find(class_="card-body") is None

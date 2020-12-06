@@ -51,7 +51,7 @@ def search_query(fields):
     return sorted(results, key=lambda x: x.id)
 
 
-@app.route("/tips")
+@app.route("/")
 def get_tips():
     # The following is a hack and will be replaced by a proper solution that
     # works with multiple search filters.

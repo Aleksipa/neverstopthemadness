@@ -27,7 +27,6 @@ csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
 
-from application import views
 from application.tips import models, views
 
 db.create_all()

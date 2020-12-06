@@ -9,10 +9,6 @@ from tests.util import make_soup, reset_database
 def step_impl(context):
     reset_database()
 
-@when("käyttäjä avaa etusivun")
-def step_impl(context):
-    context.response = context.client.get("/")
-
 @when("käyttäjä avaa sivun kirjan lisäämiselle")
 def open_add_book(context):
     context.response = context.client.get("/tips/add-book")
@@ -56,7 +52,7 @@ def user_(context):
 
 @when("käyttäjä avaa vinkkilista sivun")
 def open_tips(context):
-    context.response = context.client.get("/tips")
+    context.response = context.client.get("/")
 
 @when("käyttäjä poistaa vinkin")
 def tips_remove(context):
@@ -79,7 +75,7 @@ def user_sees_list(context):
 @then("käyttäjä näkee vinkkilistan, jossa vinkki on merkitty luetuksi")
 def user_sees_that_tip_is_read(context):
      
-     resp = context.client.get("/tips")
+     resp = context.client.get("/")
      soup = make_soup(resp.data)
      tip = soup.find(id=context.id)
      assert "Kyllä" in soup.text
@@ -87,18 +83,11 @@ def user_sees_that_tip_is_read(context):
 @then("käyttäjä näkee vinkkilistan, jossa vinkki on merkitty lukemattomaksi")
 def user_sees_that_tip_is_read(context):
      
-     resp = context.client.get("/tips")
+     resp = context.client.get("/")
      soup = make_soup(resp.data)
      tip = soup.find(id=context.id)
      assert "Ei" in soup.text
 
-
-@then("käyttäjä näkee staattisen vinkkilistan")
-def step_impl(context):
-    page = make_soup(context.response.data).text
-    assert "Otsikko: Clean Code: A Handbook of Agile Software Craftsmanship" in page
-    assert "Otsikko: Merge sort algorithm" in page
-    assert "Otsikko: Consistency models" in page
 
 @then("käyttäjä näkee oikeanlaisen kirja formin")
 def form_is_right(context):
@@ -145,12 +134,12 @@ def tip_is_not_added_to_list(context):
 
 @when("käyttäjä avaa vinkkisivun")
 def step_impl(context):
-    context.response = context.client.get("/tips")
+    context.response = context.client.get("/")
 
 
 @when('hakee ehdon "{filter}" arvolla "{value}"')
 def step_impl(context, filter, value):
-    context.response = context.client.get(f"/tips?{filter}={value}")
+    context.response = context.client.get(f"/?{filter}={value}")
 
 
 @then('ainoastaan vinkki "{text}" näkyy')
