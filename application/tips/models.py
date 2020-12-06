@@ -1,3 +1,6 @@
+from sqlalchemy import func
+from sqlalchemy.sql.expression import true
+
 from application import db
 
 
@@ -22,6 +25,24 @@ class Tip(db.Model):
         "Book": "kirja",
         "Video": "video",
         "Audiobook": "äänikirja"
+    }
+
+    # Maps column names to names displayed to the user. If you add new columns
+    # to existing models or new models with new column names, remember to add
+    # the corresponding display name here.
+    column_display_names = {
+        "author": "Kirjoittaja",
+        "comment": "Kommentti",
+        "isbn": "ISBN",
+        "lengthInSeconds": "Kesto",
+        "narrator": "Lukija",
+        "publication_year": "Julkaisuvuosi",
+        "pages": "Sivuja",
+        "related_courses": "Liittyvät kurssit",
+        "source": "Url",
+        "tags": "Tunnisteet",
+        "title": "Otsikko",
+        "upload_date": "Latauspäivämäärä",
     }
 
     @staticmethod
@@ -54,8 +75,9 @@ class Tip(db.Model):
 
     def display_type(self):
         return Tip.display_types[self.type]
+
     def display_read(self):
-        if self.read: 
+        if self.read:
             return "Kyllä"
         return "Ei"
 
@@ -102,58 +124,90 @@ class Audiobook(Tip):
 
 
 class ColumnDescriptor:
-    def __init__(self, display_name, models):
+    """Contains information about a database table column."""
+
+    def __init__(self, display_name):
         self.display_name = display_name
-        self.models = models
+        self.models = set()
+
+    @staticmethod
+    def compute(*columns):
+        """Constructs a dict of `ColumnDescriptor`s from a list of column
+        objects.
+        """
+        descriptors = {}
+        for column in columns:
+            name = column.property.columns[0].name
+            model = column.class_
+            display_name = Tip.column_display_names[name]
+
+            desc = descriptors.setdefault(name, ColumnDescriptor(display_name))
+            desc.models.add(model)
+        return descriptors
 
 
-column_descriptors = {
-    "comment": ColumnDescriptor(
-        display_name="Kommentti",
-        models=[Tip],
-    ),
-    "related_courses": ColumnDescriptor(
-        display_name="Liittyvät kurssit",
-        models=[Tip],
-    ),
-    "tags": ColumnDescriptor(
-        display_name="Tunnisteet",
-        models=[Tip],
-    ),
-    "title": ColumnDescriptor(
-        display_name="Otsikko",
-        models=[Book, Video, Audiobook],
-    ),
-    "author": ColumnDescriptor(
-        display_name="Kirjoittaja",
-        models=[Book, Audiobook],
-    ),
-    "publication_year": ColumnDescriptor(
-        display_name="Julkaisuvuosi",
-        models=[Book, Audiobook],
-    ),
-    "isbn": ColumnDescriptor(
-        display_name="ISBN",
-        models=[Book, Audiobook],
-    ),
-    "pages": ColumnDescriptor(
-        display_name="Sivuja",
-        models=[Book],
-    ),
-    "source": ColumnDescriptor(
-        display_name="Url",
-        models=[Video],
-    ),
-    "upload_date": ColumnDescriptor(
-        display_name="Latauspäivämäärä",
-        models=[Video],
-    ),
-    "narrator": ColumnDescriptor(
-        display_name="Kertoja",
-        models=[Audiobook]
-    ),
-    "lengthInSeconds": ColumnDescriptor(
-        display_name="Pituus",
-        models=[Audiobook]
-    ),
-}
+# This is a list of all fields the user can search. When you add new fields to
+# existing models or completely new models, add all user-searchable fields to
+# this list.
+searchable_fields = ColumnDescriptor.compute(
+    Audiobook.author,
+    Audiobook.isbn,
+    Audiobook.lengthInSeconds,
+    Audiobook.narrator,
+    Audiobook.publication_year,
+    Audiobook.title,
+
+    Book.author,
+    Book.isbn,
+    Book.pages,
+    Book.publication_year,
+    Book.title,
+
+    Tip.comment,
+    Tip.related_courses,
+    Tip.tags,
+
+    Video.source,
+    Video.title,
+    Video.upload_date,
+)
+
+
+class SearchQuery:
+    """Queries the database for tips with filters passed in the constructor.
+    Possible fields are listed in `searchable_fields`.
+    """
+
+    def __init__(self, fields):
+        """`fields` must be a dict-like object of string keys mapped to string
+        values."""
+        # The resulting filters keyed by table object.
+        self.filters = {}
+        self.process_fields(fields)
+
+    def process_model(self, model, field, value):
+        """Determines the filter to apply for `field` in `model`. `value` is the
+        value of the search input for this field."""
+        column = getattr(model, field)
+        column_type = str(column.property.columns[0].type)
+        if column_type == "TEXT":
+            return func.lower(column).contains(func.lower(value))
+        else:
+            return column == value
+
+    def process_fields(self, fields):
+        """Processes all fields in `fields`."""
+        for field, value in fields.items():
+            desc = searchable_fields[field]
+            for model in desc.models:
+                current_filter = self.filters.setdefault(model, true())
+                new_filter = self.process_model(model, field, value)
+                self.filters[model] = current_filter & new_filter
+
+    def execute(self):
+        """Executes the query. Returns a list of database model instances
+        inheriting from `Tip`."""
+        results = set()
+        for model, filter in self.filters.items():
+            results.update(model.query.filter(filter).all())
+        return sorted(results, key=lambda x: x.id)

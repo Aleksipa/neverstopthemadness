@@ -84,7 +84,7 @@
     <h6 class="card-subtitle mb-2 text-muted">Luettu</h6>
     <p class="card-text">{{ tip.display_read() }}
         <form action="{{ url_for('tips_change_read', tip_id = tip.id) }}" method="post">
-            {{ form.csrf_token }}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <button class="btn btn-primary mr-3" type="submit">
                 {% if tip.read %}
                 Merkitse lukemattomaksi
