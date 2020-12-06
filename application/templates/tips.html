@@ -7,13 +7,6 @@
 {% endif %}
 {% endmacro %}
 
-{% macro read(name, value) %}
-{% if value %}
-<h6 class="card-subtitle mb-2 text-muted">{{name}}</h6>
-<p class="card-text">{{ value }}</p>
-{% endif %}
-{% endmacro %}
-
 {% block body %}
 <script>
     function onSubmit(e) {

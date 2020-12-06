@@ -1,17 +1,6 @@
 {% extends "layout.html" %}
 
-{% macro field_input(field, placeholder=None) %}
-<div class="form-group">
-  {{ field.label }}
-  {{ field(
-    class_="form-control",
-    placeholder=field.label.text if placeholder == None else placeholder,
-  )}}
-  {% for error in field.errors %}
-  <small class="form-text text-muted text-danger">{{ error }}</small>
-  {% endfor %}
-</div>
-{% endmacro %}
+{% from "util.html" import field_input %}
 
 {% block body %}
 <div class="container mt-2">

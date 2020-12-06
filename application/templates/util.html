@@ -1,0 +1,12 @@
+{% macro field_input(field, placeholder=None) %}
+<div class="form-group">
+  {{ field.label }}
+  {{ field(
+    class_="form-control",
+    placeholder=field.label.text if placeholder == None else placeholder,
+  )}}
+  {% for error in field.errors %}
+  <small class="form-text text-danger">{{ error }}</small>
+  {% endfor %}
+</div>
+{% endmacro %}
