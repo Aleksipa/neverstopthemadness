@@ -26,23 +26,7 @@ def test_tips_render_video(client):
     assert "test source" in soup.text
     assert "test comment" in soup.text
     assert "Ohjelmointi, algoritmit" in soup.text
-
-def test_edit_or_delete_button_exists(client):
-    db.session().add(Video(
-        title="test video",
-        source="test source",
-        comment="test comment",
-        tags="Ohjelmointi, algoritmit"
-    ))
-    soup = make_soup(client.get("/").data)
-    links = soup.findAll('td')
-    exists = False
-    for link in links:
-        if link.text == 'Muokkaa tai poista':
-            exists = True
-            break
-    assert exists == False
-
+    
 def test_empty_db(client):
     db.session().query(Tip).delete()
     soup = make_soup(client.get("/").data)
