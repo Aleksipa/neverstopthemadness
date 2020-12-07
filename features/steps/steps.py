@@ -1,7 +1,7 @@
 from behave import *
 
 from application import db
-from application.tips.models import Tip, Book, Video
+from application.tips.models import Tip, Book, Video, Audiobook
 from tests.util import make_soup, reset_database
 
 
@@ -35,6 +35,31 @@ def user_fills_video_form_wrong(context):
         "title": "test shouldnt exist",
         "upload_date": '2020-12-01',
         "comment": "test comment"
+    }
+
+@when("käyttäjä avaa sivun äänikirjan lisäämiselle")
+def open_add_audiobook(context):
+    context.response = context.client.get("/tips/add-audiobook")
+
+@when("käyttäjä täyttää äänikirjan lomakkeen oikein")
+def user_fills_audiobook_form_correctly(context):
+    context.path = "/tips/add-audiobook"
+    context.form_data = {
+        "title": "new audiobook",
+        "author": "some author",
+        "narrator": "some narrator",
+        "publication_year": 2019,
+        "lengthInSeconds": 8024,
+        "comment": "test comment"
+    }
+
+@when("käyttäjä täyttää äänikirjan lomakkeen väärin")
+def user_fills_audiobook_form_wrong(context):
+    context.path = "/tips/add-audiobook"
+    context.form_data = {
+        "title": "valid title",
+        "narrator": "but missing author",
+        "comment": "gives and error"
     }
 
 @when("käyttäjä lähettää lomakkeen")
@@ -131,6 +156,41 @@ def tip_is_not_added_to_list(context):
 
     assert len(videos) == 0
 
+@then("käyttäjä näkee oikeanlaisen äänikirjan formin")
+def audiobook_form_is_right(context):
+    page = make_soup(context.response.data)
+
+    assert 8 == len(page.find_all('input'))
+    assert 1 == len(page.find_all('textarea'))
+    assert "Otsikko" in page.text
+    assert "Kirjailija" in page.text
+    assert "Lukija" in page.text
+    assert "Julkaisuvuosi" in page.text
+    assert "ISBN" in page.text
+    assert "Pituus" in page.text
+    assert "Liittyvät kurssit" in page.text
+    assert "Tunnisteet" in page.text
+    assert "Oma kommentti" in page.text
+
+@then("äänikirja lisätään vinkkeihin")
+def audiobook_is_added_to_list(context):
+    audiobooks = Audiobook.query.filter_by(title=context.form_data['title']).all()
+
+    assert len(audiobooks) == 1
+    new_audiobook = audiobooks[0]
+    assert new_audiobook.title == context.form_data['title']
+    assert new_audiobook.author == context.form_data['author']
+    assert new_audiobook.narrator == context.form_data['narrator']
+    assert new_audiobook.title == context.form_data['title']
+    assert new_audiobook.publication_year == context.form_data['publication_year']
+    assert new_audiobook.lengthInSeconds == context.form_data['lengthInSeconds']
+    assert new_audiobook.comment == context.form_data['comment']
+
+@then("äänikirjaa ei lisätä vinkkeihin")
+def audiobook_is_not_added_to_list(context):
+    audiobooks = Audiobook.query.filter_by(title=context.form_data['title']).all()
+
+    assert len(audiobooks) == 0
 
 @when("käyttäjä avaa vinkkisivun")
 def step_impl(context):
