@@ -107,7 +107,7 @@ def add_audiobook():
 
 
 @app.route("/tips/add", methods=["GET"])
-def add():
+def tips_add():
 
     return render_template("add_tip.html")
 
