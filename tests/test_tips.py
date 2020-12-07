@@ -4,7 +4,7 @@ import re
 from bs4.element import ResultSet
 
 from application import db
-from application.tips.models import Tip, Book, Video, Audiobook
+from application.tips.models import Tip, Book, Video, Audiobook, Movie
 from tests.util import make_soup, reset_database
 
 
@@ -122,11 +122,34 @@ def test_successful_post_audiobook(client):
     assert new_audiobook[0].publication_year == 2018
     assert new_audiobook[0].isbn == ""
     assert new_audiobook[0].lengthInSeconds == 12180
+    
+def test_missing_mandatory_field_movie(client):
+    resp = client.post("/tips/add-movie", data={
+        "director": "test director"
+    })
+    soup = make_soup(resp.data)
+    title = soup.find(attrs={"id": "title"}).parent
+    assert "This field is required" in title.text
+    assert Movie.query.filter_by(title="test title").count() == 0
+
+def test_successful_post_movie(client):
+    resp = client.post("/tips/add-movie", data={
+        "title": "new movie",
+        "director": "test director",
+        "publication_year": 2018,
+        "lengthInSeconds": 12180
+    })
+    assert resp.status_code == 302
+    new_movie = Movie.query.filter_by(title="new movie", director="test director").all()
+    assert new_movie[0].title == "new movie"
+    assert new_movie[0].director == "test director"
+    assert new_movie[0].publication_year == 2018
+    assert new_movie[0].lengthInSeconds == 12180
 
 def test_empty_search(client):
     reset_database()
     soup = make_soup(client.get("/").data)
-    assert len(soup.find_all(class_="card-body")) == 3
+    assert len(soup.find_all(class_="card-body")) == 4
     assert soup.find(string=re.compile("Poista rajaukset")) is None
 
 

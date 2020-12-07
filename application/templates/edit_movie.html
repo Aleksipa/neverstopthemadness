@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% from "util.html" import field_input %}
+
+{% block body %}
+<div class="container mt-2">
+  <h1>Elokuvan muokkaus</h1>
+  <form method="POST" action="{{url_for('edit_movie_tip', tip_id=tip_id)}}">
+    {{ form.csrf_token }}
+    {{ field_input(form.title, "Leffa")}}
+    {{ field_input(form.director, "Quentin Tarantino")}}
+    {{ field_input(form.publication_year) }}
+    {{ field_input(form.lengthInSeconds, "") }}
+    {{ field_input(form.comment, "") }}
+    {{ field_input(form.tags, "") }}
+    <button type="submit" class="btn btn-primary">Tallenna</button>
+  </form>
+</div>
+{% endblock %}
