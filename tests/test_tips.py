@@ -4,7 +4,7 @@ import re
 from bs4.element import ResultSet
 
 from application import db
-from application.tips.models import Tip, Book, Video
+from application.tips.models import Tip, Book, Video, Audiobook
 from tests.util import make_soup, reset_database
 
 
@@ -96,6 +96,32 @@ def test_successful_post_video(client):
     assert new_video[0].comment == 'test comment'
     assert new_video[0].related_courses == ''
 
+def test_missing_mandatory_field_audiobook(client):
+    resp = client.post("/tips/add-audiobook", data={
+        "title": "test title"
+    })
+    soup = make_soup(resp.data)
+    author = soup.find(attrs={"id": "author"}).parent
+    assert "This field is required" in author.text
+    assert Audiobook.query.filter_by(title="test title").count() == 0
+
+def test_successful_post_audiobook(client):
+    resp = client.post("/tips/add-audiobook", data={
+        "title": "new audiobook",
+        "author": "test author",
+        "narrator": "test narrator",
+        "publication_year": 2018,
+        "isbn": "",
+        "lengthInSeconds": 12180
+    })
+    assert resp.status_code == 302
+    new_audiobook = Audiobook.query.filter_by(title="new audiobook", author="test author").all()
+    assert new_audiobook[0].title == "new audiobook"
+    assert new_audiobook[0].author == "test author"
+    assert new_audiobook[0].narrator == "test narrator"
+    assert new_audiobook[0].publication_year == 2018
+    assert new_audiobook[0].isbn == ""
+    assert new_audiobook[0].lengthInSeconds == 12180
 
 def test_empty_search(client):
     reset_database()

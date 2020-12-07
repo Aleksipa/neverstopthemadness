@@ -3,8 +3,8 @@ from flask.helpers import url_for
 from werkzeug.utils import redirect
 
 from application import app, db
-from application.tips.models import SearchQuery, Tip, Book, Video, searchable_fields
-from application.tips.forms import AddBookForm, AddVideoForm
+from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, searchable_fields
+from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm
 
 
 @app.route("/tips/edit/tip/<tip_id>", methods=["GET"])
@@ -107,7 +107,7 @@ def add_audiobook():
             narrator=form.narrator.data,
             publication_year=form.publication_year.data,
             isbn=form.isbn.data,
-            lengthInSeconds=form.length.data
+            lengthInSeconds=form.lengthInSeconds.data
         ))
         db.session().commit()
         return redirect(url_for("get_tips"))
