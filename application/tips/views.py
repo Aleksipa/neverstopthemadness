@@ -7,14 +7,6 @@ from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, se
 from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm
 
 
-@app.route("/tips/edit/tip/<tip_id>", methods=["GET"])
-def edit_tip(tip_id):
-    return render_template(
-        "edit_tip.html",
-        tip=Tip.query.get(tip_id)
-    )
-
-
 def compute_search_criteria_fields():
     choices = []
     for key, desc in searchable_fields.items():
