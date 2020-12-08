@@ -123,6 +123,18 @@ def test_successful_post_audiobook(client):
     assert new_audiobook[0].isbn == ""
     assert new_audiobook[0].lengthInSeconds == 12180
 
+def test_successful_edit_audiobook(client):
+    old_audiobook = Audiobook.query.filter_by(isbn="978-7834915091").all()
+    resp = client.post("/tips/edit/audiobook/" + str(old_audiobook[0].id) + "/", data={
+        "title": "Python Programming: The Ultimate Beginner's Guide",
+        "author": "test author"
+    })
+    assert resp.status_code == 302
+
+    new_audiobook = Audiobook.query.filter_by(isbn="978-7834915091").all()
+    assert new_audiobook[0].title == "Python Programming: The Ultimate Beginner's Guide"
+    assert new_audiobook[0].author == "test author"
+
 def test_empty_search(client):
     reset_database()
     soup = make_soup(client.get("/").data)

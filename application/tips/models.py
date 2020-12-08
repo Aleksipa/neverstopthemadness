@@ -67,6 +67,7 @@ class Tip(db.Model):
             title="Python Programming: The Ultimate Beginner's Guide to Master Python Programming Step by Step with Practical Exercices",
             author="Charles Walker",
             narrator="Russell Newton",
+            isbn="978-7834915091",
             publication_year=2020,
             tags="Ohjelmointi, python",
             lengthInSeconds=12180
