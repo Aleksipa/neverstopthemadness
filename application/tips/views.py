@@ -205,6 +205,7 @@ def edit_video_tip(tip_id):
         return redirect(url_for("get_tips"))
     return render_template("edit_video.html", form=form)
 
+
 @app.route("/tips/edit/movie/<tip_id>/", methods=["POST"])
 def edit_movie_tip(tip_id):
 
@@ -212,15 +213,33 @@ def edit_movie_tip(tip_id):
 
     form = AddMovieForm(formdata=request.form, obj=tip_to_edit)
 
+@app.route("/tips/edit/audiobook/<tip_id>/", methods=["POST"])
+def edit_audiobook_tip(tip_id):
+
+    tip_to_edit = Tip.query.get_or_404(tip_id)
+
+    form = AddAudiobookForm(formdata=request.form, obj=tip_to_edit)
+
     if form.validate_on_submit():
         tip_to_edit.comment = form.comment.data
         tip_to_edit.related_courses = form.related_courses.data
         tip_to_edit.tags = form.tags.data
         tip_to_edit.title = form.title.data
+
         tip_to_edit.director = form.director.data
         tip_to_edit.publication_year = form.publication_year.data
+
+        tip_to_edit.author = form.author.data
+        tip_to_edit.narrator = form.narrator.data
+        tip_to_edit.publication_year = form.publication_year.data
+        tip_to_edit.isbn = form.isbn.data
+
         tip_to_edit.lengthInSeconds = form.lengthInSeconds.data
 
         db.session().commit()
         return redirect(url_for("get_tips"))
+
     return render_template("edit_movie.html", form=form)
+
+    return render_template("edit_audiobook.html", form=form)
+
