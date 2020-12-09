@@ -24,7 +24,8 @@ class Tip(db.Model):
         "Tip": "vinkki",
         "Book": "kirja",
         "Video": "video",
-        "Audiobook": "äänikirja"
+        "Audiobook": "äänikirja",
+        "Movie": "elokuva"
     }
 
     # Maps column names to names displayed to the user. If you add new columns
@@ -43,6 +44,7 @@ class Tip(db.Model):
         "tags": "Tunnisteet",
         "title": "Otsikko",
         "upload_date": "Latauspäivämäärä",
+        "director": "ohjaaja",
     }
 
     @staticmethod
@@ -71,6 +73,13 @@ class Tip(db.Model):
             publication_year=2020,
             tags="Ohjelmointi, python",
             lengthInSeconds=12180
+        ))
+        db.session().add(Movie(
+            title="Monthy Python and the Holy Grail",
+            director="Terry Gilliam, Terry Jones",
+            publication_year=1975,
+            tags="python",
+            lengthInSeconds=5520
         ))
         db.session().commit()
 
@@ -123,6 +132,17 @@ class Audiobook(Tip):
     isbn = db.Column(db.Text)
     lengthInSeconds = db.Column(db.Integer)
 
+class Movie(Tip):
+    __tablename__ = "Movie"
+    __mapper_args__ = {
+        "polymorphic_identity": "Movie",
+    }
+
+    id = db.Column(db.Integer, db.ForeignKey("Tip.id"), primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+    director = db.Column(db.Text, nullable=False)
+    publication_year = db.Column(db.Integer)
+    lengthInSeconds = db.Column(db.Integer)
 
 class ColumnDescriptor:
     """Contains information about a database table column."""
@@ -171,6 +191,12 @@ searchable_fields = ColumnDescriptor.compute(
     Video.source,
     Video.title,
     Video.upload_date,
+
+    Movie.director,
+    Movie.lengthInSeconds,
+    Movie.publication_year,
+    Movie.title,
+
 )
 
 

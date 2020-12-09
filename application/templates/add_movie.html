@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% from "util.html" import field_input %}
+
+{% block body %}
+<div class="container mt-2">
+  <h1>Elokuva</h1>
+  <form method="POST">
+    {{ form.csrf_token }}
+    {{ field_input(form.title, "Leffa")}}
+    {{ field_input(form.director, "Quentin Tarantino")}}
+    {{ field_input(form.publication_year) }}
+    {{ field_input(form.lengthInSeconds, "") }}
+    {{ field_input(form.comment, "") }}
+    {{ field_input(form.tags, "") }}
+    {{ field_input(form.related_courses, "") }}
+    <button type="submit" class="btn btn-primary">Luo</button>
+  </form>
+</div>
+{% endblock %}

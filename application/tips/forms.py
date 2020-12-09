@@ -33,3 +33,9 @@ class AddAudiobookForm(AddTipForm):
     publication_year = IntegerField("Julkaisuvuosi", [Optional()])
     isbn = StringField("ISBN", [Optional()])
     lengthInSeconds = IntegerField("Pituus", [Optional(), NumberRange(0)])
+
+class AddMovieForm(AddTipForm):
+    title = StringField("Otsikko", [InputRequired()])
+    director = StringField("Ohjaaja", [InputRequired()])
+    publication_year = IntegerField("Julkaisuvuosi", [Optional()])
+    lengthInSeconds = IntegerField("Pituus", [Optional(), NumberRange(0)])
