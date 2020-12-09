@@ -259,6 +259,11 @@ def step_impl(context, filter, value):
     context.response = context.client.get(f"/?{filter}={value}")
 
 
+@when('hakee ehtojen "{filter1}" ja "{filter2}" arvoilla "{value1}" ja "{value2}"')
+def step_impl(context, filter1, filter2, value1, value2):
+    context.response = context.client.get(
+        f"/?{filter1}={value1}&{filter2}={value2}")
+
 @then('ainoastaan vinkki "{text}" näkyy')
 def step_impl(context, text):
     page = make_soup(context.response.data)

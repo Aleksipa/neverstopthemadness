@@ -8,34 +8,32 @@
 {% endmacro %}
 
 {% block body %}
-<script>
-    function onSubmit(e) {
-        const form = e.target;
-        const selects = form.querySelectorAll(".field-select");
-        const values = form.querySelectorAll(".field-value");
-        for (let i = 0; i < selects.length; i++) {
-            const newInput = document.createElement("input");
-            newInput.name = selects[i].value;
-            newInput.value = values[i].value;
-            newInput.style.display = "none";
-            form.appendChild(newInput);
-            selects[i].name = "";
-            values[i].name = "";
-        }
-    }
-</script>
+<template id="search-filter-template">
+    <div class="mb-3">
+        <select class="form-control mr-3 field-select">
+            {% for field in search_fields %}
+            <option value="{{ field['value'] }}">
+                {{ field["name"] }}
+            </option>
+            {% endfor %}
+        </select>
+        <input type="text" class="form-control mr-3 field-value" />
+        <button class="btn btn-danger remove-button" type="button">
+            Poista rajaus
+        </button>
+    </div>
+</template>
 <h1>Vinkit</h1>
 <form class="form-inline mt-3" method="GET" action="{{ url_for('get_tips') }}"
     onsubmit="onSubmit(event)">
-    <select class="form-control mr-3 field-select">
-        {% for field in search_fields %}
-        <option value="{{ field['value'] }}" {{ selected_attribute(field["value"]) }}>
-            {{ field["name"] }}
-        </option>
-        {% endfor %}
-    </select>
-    <input type="text" class="form-control mr-3 field-value"
-        value="{{ selected_value }}" />
+    <div class="d-flex flex-column w-100" id="search-filter-list"></div>
+    {% for error in validation_errors %}
+    <small class="text-danger w-100 mb-3">{{ error }}</small>
+    {% endfor %}
+    <button class="btn btn-success mr-3" type="button"
+        onclick="searchFilterList.addFilter()">
+        Lisää rajaus
+    </button>
     <button class="btn btn-primary mr-3" type="submit">Hae</button>
     {% if request.args.__len__() > 0 %}
     <a href="{{ url_for('get_tips') }}" class="btn btn-secondary">
@@ -120,4 +118,55 @@
     </div>
 </div>
 {% endfor %}
+<script>
+    const filters = {{ filters| tojson }};
+    let searchFilterList, filterTemplate;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        filterTemplate = document.getElementById("search-filter-template");
+        searchFilterList = new SearchFilterList(
+            document.getElementById("search-filter-list"),
+            filters,
+        );
+    });
+
+    class SearchFilterList {
+        constructor(element, filters) {
+            this.addFilter = this.addFilter.bind(this);
+            this.element = element;
+            for (const [field, value] of filters) {
+                this.addFilter(field, value);
+            }
+        }
+
+        addFilter(field, value) {
+            const filter = filterTemplate.content
+                .cloneNode(true).firstElementChild;
+            if (field) {
+                const selectInput = filter.querySelector(".field-select");
+                selectInput.value = field;
+            }
+            if (value) {
+                const valueInput = filter.querySelector(".field-value");
+                valueInput.value = value;
+            }
+            const removeButton = filter.querySelector(".remove-button");
+            removeButton.addEventListener("click", () => filter.remove());
+            this.element.appendChild(filter);
+        }
+    }
+
+    function onSubmit(e) {
+        const form = e.target;
+        const selects = form.querySelectorAll(".field-select");
+        const values = form.querySelectorAll(".field-value");
+        for (let i = 0; i < selects.length; i++) {
+            const newInput = document.createElement("input");
+            newInput.name = selects[i].value;
+            newInput.value = values[i].value;
+            newInput.style.display = "none";
+            form.appendChild(newInput);
+        }
+    }
+</script>
 {% endblock %}

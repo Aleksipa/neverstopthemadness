@@ -161,9 +161,14 @@ class ColumnDescriptor:
             name = column.property.columns[0].name
             model = column.class_
             display_name = Tip.column_display_names[name]
-
             desc = descriptors.setdefault(name, ColumnDescriptor(display_name))
-            desc.models.add(model)
+
+            if model is Tip:
+                # These columns are inherited by all other tip types.
+                for cls in model.__subclasses__():
+                    desc.models.add(cls)
+            else:
+                desc.models.add(model)
         return descriptors
 
 
@@ -224,9 +229,14 @@ class SearchQuery:
 
     def process_fields(self, fields):
         """Processes all fields in `fields`."""
-        for field, value in fields.items():
-            desc = searchable_fields[field]
-            for model in desc.models:
+        models = set()
+        for i, field in enumerate(fields.keys()):
+            if i == 0:
+                models.update(searchable_fields[field].models)
+            else:
+                models.intersection_update(searchable_fields[field].models)
+        for model in models:
+            for field, value in fields.items():
                 current_filter = self.filters.setdefault(model, true())
                 new_filter = self.process_model(model, field, value)
                 self.filters[model] = current_filter & new_filter

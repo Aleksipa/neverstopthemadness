@@ -3,8 +3,11 @@ from flask.helpers import url_for
 from werkzeug.utils import redirect
 
 from application import app, db
-from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, Movie, searchable_fields
-from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm, AddMovieForm
+
+from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, searchable_fields
+from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm, validate_search_form
+
+
 
 
 def compute_search_criteria_fields():
@@ -23,29 +26,26 @@ search_criteria_fields = compute_search_criteria_fields()
 
 @app.route("/")
 def get_tips():
-    # The following is a hack and will be replaced by a proper solution that
-    # works with multiple search filters.
-    selected_field = ""
-    selected_value = ""
-    search_fields = list(request.args.items())
-    if len(search_fields) > 0:
-        selected_field, selected_value = list(request.args.items())[0]
-        if selected_value.strip() == "":
-            tips = Tip.query.all()
-        else:
+    validation_errors = validate_search_form(request.args)
+    tips = []
+    status = 200
+    if validation_errors:
+        status = 403
+    else:
+        if len(request.args) > 0:
             try:
                 tips = SearchQuery(request.args).execute()
             except Exception:
                 abort(404)
-    else:
-        tips = Tip.query.all()
+        else:
+            tips = Tip.query.all()
     return render_template(
         "tips.html",
         tips=tips,
+        filters=list(request.args.items(True)),
         search_fields=search_criteria_fields,
-        selected_attribute=lambda x: "selected" if x == selected_field else "",
-        selected_value=selected_value,
-    )
+        validation_errors=validation_errors,
+    ), status
 
 
 @app.route("/tips/add-book", methods=["GET", "POST"])
