@@ -155,3 +155,19 @@ def test_search_invalid_field(client):
     reset_database()
     soup = make_soup(client.get("/?asdasd=asd").data)
     assert soup.find(class_="card-body") is None
+
+
+def test_search_multiple_fields(client):
+    reset_database()
+    soup = make_soup(client.get(
+        "/?related_courses=tuotanto&author=martin").data)
+    assert len(soup.find_all(class_="card-body")) == 1
+    assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
+
+
+def test_search_duplicate_fields(client):
+    resp = client.get("/?title=handbook&title=sort")
+    soup = make_soup(resp.data)
+
+    assert resp.status_code == 403
+    assert "Samaa kenttää ei voi hakea useaan kertaan" in soup.text
