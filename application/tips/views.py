@@ -4,8 +4,8 @@ from werkzeug.utils import redirect
 
 from application import app, db
 
-from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, searchable_fields
-from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm, validate_search_form
+from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, searchable_fields, Movie
+from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm, validate_search_form, AddMovieForm
 
 
 
