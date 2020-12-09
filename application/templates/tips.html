@@ -75,6 +75,14 @@
             
               
     {% endif %}
+    {% if tip.type == "Movie" %}
+        
+        {{ entry("Ohjaaja", tip.director)}}
+        {{ entry("Kesto", tip.lengthInSeconds)}}
+        {{ entry("Julkaisuvuosi", tip.publication_year)}}
+            
+              
+    {% endif %}
     {{ entry("Tunnisteet", tip.tags) }}
     {{ entry("Liittyvät kurssit", tip.related_courses) }}
     {{ entry ("Kommentti", tip.comment)}}

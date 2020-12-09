@@ -3,16 +3,11 @@ from flask.helpers import url_for
 from werkzeug.utils import redirect
 
 from application import app, db
+
 from application.tips.models import SearchQuery, Tip, Book, Video, Audiobook, searchable_fields
 from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm, validate_search_form
 
 
-@app.route("/tips/edit/tip/<tip_id>", methods=["GET"])
-def edit_tip(tip_id):
-    return render_template(
-        "edit_tip.html",
-        tip=Tip.query.get(tip_id)
-    )
 
 
 def compute_search_criteria_fields():
@@ -110,6 +105,24 @@ def add_audiobook():
         return redirect(url_for("get_tips"))
     return render_template("add_audiobook.html", form=form)
 
+@app.route("/tips/add-movie", methods=["GET", "POST"])
+def add_movie():
+    form = AddMovieForm()
+
+    if form.validate_on_submit():
+        db.session().add(Movie(
+            comment=form.comment.data,
+            related_courses=form.related_courses.data,
+            tags=form.tags.data,
+            title=form.title.data,
+            director=form.director.data,
+            lengthInSeconds=form.lengthInSeconds.data,
+            publication_year=form.publication_year.data,
+
+        ))
+        db.session().commit()
+        return redirect(url_for("get_tips"))
+    return render_template("add_movie.html", form=form)
 
 @app.route("/tips/add", methods=["GET"])
 def add():
@@ -193,6 +206,28 @@ def edit_video_tip(tip_id):
     return render_template("edit_video.html", form=form)
 
 
+@app.route("/tips/edit/movie/<tip_id>/", methods=["POST"])
+def edit_movie_tip(tip_id):
+
+    tip_to_edit = Tip.query.get_or_404(tip_id)
+
+    form = AddMovieForm(formdata=request.form, obj=tip_to_edit)
+
+    if form.validate_on_submit():
+        tip_to_edit.comment = form.comment.data
+        tip_to_edit.related_courses = form.related_courses.data
+        tip_to_edit.tags = form.tags.data
+        tip_to_edit.title = form.title.data
+        tip_to_edit.publication_year = form.publication_year.data
+        tip_to_edit.director = form.director.data
+        tip_to_edit.lengthInSeconds = form.lengthInSeconds.data
+
+        db.session().commit()
+        return redirect(url_for("get_tips"))
+
+
+    return render_template("edit_movie.html", form=form)
+
 @app.route("/tips/edit/audiobook/<tip_id>/", methods=["POST"])
 def edit_audiobook_tip(tip_id):
 
@@ -205,12 +240,14 @@ def edit_audiobook_tip(tip_id):
         tip_to_edit.related_courses = form.related_courses.data
         tip_to_edit.tags = form.tags.data
         tip_to_edit.title = form.title.data
+        tip_to_edit.publication_year = form.publication_year.data
         tip_to_edit.author = form.author.data
         tip_to_edit.narrator = form.narrator.data
-        tip_to_edit.publication_year = form.publication_year.data
         tip_to_edit.isbn = form.isbn.data
         tip_to_edit.lengthInSeconds = form.lengthInSeconds.data
 
         db.session().commit()
         return redirect(url_for("get_tips"))
+
     return render_template("edit_audiobook.html", form=form)
+

@@ -4,7 +4,7 @@ import re
 from bs4.element import ResultSet
 
 from application import db
-from application.tips.models import Tip, Book, Video, Audiobook
+from application.tips.models import Tip, Book, Video, Audiobook, Movie
 from tests.util import make_soup, reset_database
 
 
@@ -122,6 +122,29 @@ def test_successful_post_audiobook(client):
     assert new_audiobook[0].publication_year == 2018
     assert new_audiobook[0].isbn == ""
     assert new_audiobook[0].lengthInSeconds == 12180
+    
+def test_missing_mandatory_field_movie(client):
+    resp = client.post("/tips/add-movie", data={
+        "director": "test director"
+    })
+    soup = make_soup(resp.data)
+    title = soup.find(attrs={"id": "title"}).parent
+    assert "This field is required" in title.text
+    assert Movie.query.filter_by(title="test title").count() == 0
+
+def test_successful_post_movie(client):
+    resp = client.post("/tips/add-movie", data={
+        "title": "new movie",
+        "director": "test director",
+        "publication_year": 2018,
+        "lengthInSeconds": 12180
+    })
+    assert resp.status_code == 302
+    new_movie = Movie.query.filter_by(title="new movie", director="test director").all()
+    assert new_movie[0].title == "new movie"
+    assert new_movie[0].director == "test director"
+    assert new_movie[0].publication_year == 2018
+    assert new_movie[0].lengthInSeconds == 12180
 
 def test_successful_edit_audiobook(client):
     old_audiobook = Audiobook.query.filter_by(isbn="978-7834915091").all()
@@ -138,7 +161,7 @@ def test_successful_edit_audiobook(client):
 def test_empty_search(client):
     reset_database()
     soup = make_soup(client.get("/").data)
-    assert len(soup.find_all(class_="card-body")) == 3
+    assert len(soup.find_all(class_="card-body")) == 4
     assert soup.find(string=re.compile("Poista rajaukset")) is None
 
 
@@ -171,3 +194,31 @@ def test_search_duplicate_fields(client):
 
     assert resp.status_code == 403
     assert "Samaa kenttää ei voi hakea useaan kertaan" in soup.text
+    
+def test_successful_edit_book(client):
+    allTips = Tip.query.all()
+    resp = client.post("/tips/edit/" + str(allTips[0].id) + "/",  data={
+        "title": "edited book",
+        "author": "some other author",
+        "publication_year": 1986,
+    })
+    assert resp.status_code == 302
+    edited_book = Book.query.filter_by(title="edited book").all()
+    assert len(edited_book) == 1
+    assert edited_book[0].title == "edited book"
+    assert edited_book[0].author == "some other author"
+    assert edited_book[0].publication_year == 1986
+
+
+def test_successful_edit_video(client):
+    allTips = Tip.query.all()
+    resp = client.post("/tips/edit/video/" + str(allTips[1].id) + "/",  data={
+        "title": "edited video",
+        "source": "www.other.com",
+        "comment": "test comment"
+    })
+    assert resp.status_code == 302
+    edited_video = Video.query.filter_by(title="edited video").all()
+    assert len(edited_video) == 1
+    assert edited_video[0].title == "edited video"
+    assert edited_video[0].comment == "test comment"
