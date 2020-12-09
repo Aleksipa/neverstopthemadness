@@ -59,9 +59,38 @@ def user_fills_audiobook_form_wrong(context):
     context.form_data = {
         "title": "valid title",
         "narrator": "but missing author",
-        "comment": "gives and error"
+        "comment": "gives an error"
     }
 
+@when("käyttäjä avaa sivun äänikirjan muokkaamiselle")
+def open_edit_audiobook(context):
+    audiobooks = Audiobook.query.all()
+    context.path = "/tips/edit/" + str(audiobooks[0].id) + "/"
+    context.response = context.client.get(context.path)
+
+@when("käyttäjä täyttää äänikirjan muokkauslomakkeen oikein")
+def user_fills_audiobook_edits_correctly(context):
+    audiobooks = Audiobook.query.all()
+    context.path = "/tips/edit/audiobook/" + str(audiobooks[0].id) + "/"
+    context.form_data = {
+        "title": "new audiobook",
+        "author": "some author",
+        "narrator": "some narrator",
+        "publication_year": 2019,
+        "lengthInSeconds": 8024,
+        "comment": "test comment"
+    }
+
+@when("käyttäjä täyttää äänikirjan muokkauslomakkeen väärin")
+def user_fills_audiobook_edits_wrong(context):
+    audiobooks = Audiobook.query.all()
+    context.path = "/tips/edit/audiobook/" + str(audiobooks[0].id) + "/"
+    context.form_data = {
+        "title": "valid title",
+        "narrator": "but missing author",
+        "comment": "gives an error"
+    }
+    
 @when("käyttäjä lähettää lomakkeen")
 def user_sends_form(context):
     context.response = context.client.post(context.path, data=context.form_data)
@@ -174,10 +203,9 @@ def audiobook_form_is_right(context):
 
 @then("äänikirja lisätään vinkkeihin")
 def audiobook_is_added_to_list(context):
-    audiobooks = Audiobook.query.filter_by(title=context.form_data['title']).all()
-
-    assert len(audiobooks) == 1
-    new_audiobook = audiobooks[0]
+    audiobooks = Audiobook.query.all()
+    assert len(audiobooks) == 2
+    new_audiobook = audiobooks[1]
     assert new_audiobook.title == context.form_data['title']
     assert new_audiobook.author == context.form_data['author']
     assert new_audiobook.narrator == context.form_data['narrator']
@@ -188,9 +216,28 @@ def audiobook_is_added_to_list(context):
 
 @then("äänikirjaa ei lisätä vinkkeihin")
 def audiobook_is_not_added_to_list(context):
-    audiobooks = Audiobook.query.filter_by(title=context.form_data['title']).all()
+    audiobooks = Audiobook.query.all()
+    assert len(audiobooks) == 1
 
-    assert len(audiobooks) == 0
+@then("muokattu äänikirja löytyy vinkeistä")
+def valid_modified_audiobook_is_found(context):
+    audiobooks = Audiobook.query.all()
+    assert len(audiobooks) == 1
+    modified_audiobook = audiobooks[0]
+    assert modified_audiobook.title == context.form_data['title']
+    assert modified_audiobook.author == context.form_data['author']
+    assert modified_audiobook.narrator == context.form_data['narrator']
+    assert modified_audiobook.title == context.form_data['title']
+    assert modified_audiobook.publication_year == context.form_data['publication_year']
+    assert modified_audiobook.lengthInSeconds == context.form_data['lengthInSeconds']
+    assert modified_audiobook.comment == context.form_data['comment']
+
+@then("muokattua äänikirjaa ei löydy vinkeistä")
+def invalid_modified_audiobook_is_not_found(context):
+    audiobooks = Audiobook.query.all()
+    assert len(audiobooks) == 1
+    unmodified_audiobook = audiobooks[0]
+    assert unmodified_audiobook.title == "Python Programming: The Ultimate Beginner's Guide to Master Python Programming Step by Step with Practical Exercices"
 
 @when("käyttäjä avaa vinkkisivun")
 def step_impl(context):
