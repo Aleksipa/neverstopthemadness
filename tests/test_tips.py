@@ -155,3 +155,31 @@ def test_search_invalid_field(client):
     reset_database()
     soup = make_soup(client.get("/?asdasd=asd").data)
     assert soup.find(class_="card-body") is None
+
+def test_successful_edit_book(client):
+    allTips = Tip.query.all()
+    resp = client.post("/tips/edit/" + str(allTips[0].id) + "/",  data={
+        "title": "edited book",
+        "author": "some other author",
+        "publication_year": 1986,
+    })
+    assert resp.status_code == 302
+    edited_book = Book.query.filter_by(title="edited book").all()
+    assert len(edited_book) == 1
+    assert edited_book[0].title == "edited book"
+    assert edited_book[0].author == "some other author"
+    assert edited_book[0].publication_year == 1986
+
+
+def test_successful_edit_video(client):
+    allTips = Tip.query.all()
+    resp = client.post("/tips/edit/video/" + str(allTips[1].id) + "/",  data={
+        "title": "edited video",
+        "source": "www.other.com",
+        "comment": "test comment"
+    })
+    assert resp.status_code == 302
+    edited_video = Video.query.filter_by(title="edited video").all()
+    assert len(edited_video) == 1
+    assert edited_video[0].title == "edited video"
+    assert edited_video[0].comment == "test comment"
