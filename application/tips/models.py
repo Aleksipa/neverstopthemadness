@@ -24,7 +24,8 @@ class Tip(db.Model):
         "Tip": "vinkki",
         "Book": "kirja",
         "Video": "video",
-        "Audiobook": "äänikirja"
+        "Audiobook": "äänikirja",
+        "Movie": "elokuva"
     }
 
     # Maps column names to names displayed to the user. If you add new columns
@@ -43,6 +44,7 @@ class Tip(db.Model):
         "tags": "Tunnisteet",
         "title": "Otsikko",
         "upload_date": "Latauspäivämäärä",
+        "director": "ohjaaja",
     }
 
     @staticmethod
@@ -71,6 +73,13 @@ class Tip(db.Model):
             publication_year=2020,
             tags="Ohjelmointi, python",
             lengthInSeconds=12180
+        ))
+        db.session().add(Movie(
+            title="Monthy Python and the Holy Grail",
+            director="Terry Gilliam, Terry Jones",
+            publication_year=1975,
+            tags="python",
+            lengthInSeconds=5520
         ))
         db.session().commit()
 
@@ -123,6 +132,17 @@ class Audiobook(Tip):
     isbn = db.Column(db.Text)
     lengthInSeconds = db.Column(db.Integer)
 
+class Movie(Tip):
+    __tablename__ = "Movie"
+    __mapper_args__ = {
+        "polymorphic_identity": "Movie",
+    }
+
+    id = db.Column(db.Integer, db.ForeignKey("Tip.id"), primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+    director = db.Column(db.Text, nullable=False)
+    publication_year = db.Column(db.Integer)
+    lengthInSeconds = db.Column(db.Integer)
 
 class ColumnDescriptor:
     """Contains information about a database table column."""
@@ -141,9 +161,14 @@ class ColumnDescriptor:
             name = column.property.columns[0].name
             model = column.class_
             display_name = Tip.column_display_names[name]
-
             desc = descriptors.setdefault(name, ColumnDescriptor(display_name))
-            desc.models.add(model)
+
+            if model is Tip:
+                # These columns are inherited by all other tip types.
+                for cls in model.__subclasses__():
+                    desc.models.add(cls)
+            else:
+                desc.models.add(model)
         return descriptors
 
 
@@ -171,6 +196,12 @@ searchable_fields = ColumnDescriptor.compute(
     Video.source,
     Video.title,
     Video.upload_date,
+
+    Movie.director,
+    Movie.lengthInSeconds,
+    Movie.publication_year,
+    Movie.title,
+
 )
 
 
@@ -198,9 +229,14 @@ class SearchQuery:
 
     def process_fields(self, fields):
         """Processes all fields in `fields`."""
-        for field, value in fields.items():
-            desc = searchable_fields[field]
-            for model in desc.models:
+        models = set()
+        for i, field in enumerate(fields.keys()):
+            if i == 0:
+                models.update(searchable_fields[field].models)
+            else:
+                models.intersection_update(searchable_fields[field].models)
+        for model in models:
+            for field, value in fields.items():
                 current_filter = self.filters.setdefault(model, true())
                 new_filter = self.process_model(model, field, value)
                 self.filters[model] = current_filter & new_filter

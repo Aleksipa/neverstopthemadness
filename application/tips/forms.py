@@ -33,3 +33,17 @@ class AddAudiobookForm(AddTipForm):
     publication_year = IntegerField("Julkaisuvuosi", [Optional()])
     isbn = StringField("ISBN", [Optional()])
     lengthInSeconds = IntegerField("Pituus", [Optional(), NumberRange(0)])
+
+def validate_search_form(args):
+    encountered = set()
+    for item in args.items(True):
+        if item[0] in encountered:
+            return ["Samaa kenttää ei voi hakea useaan kertaan"]
+        encountered.add(item[0])
+    return []
+  
+class AddMovieForm(AddTipForm):
+    title = StringField("Otsikko", [InputRequired()])
+    director = StringField("Ohjaaja", [InputRequired()])
+    publication_year = IntegerField("Julkaisuvuosi", [Optional()])
+    lengthInSeconds = IntegerField("Pituus", [Optional(), NumberRange(0)])

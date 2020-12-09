@@ -1,7 +1,7 @@
 from behave import *
 
 from application import db
-from application.tips.models import Tip, Book, Video, Audiobook
+from application.tips.models import Tip, Book, Video, Audiobook, Movie
 from tests.util import make_soup, reset_database
 
 
@@ -91,6 +91,29 @@ def user_fills_audiobook_edits_wrong(context):
         "comment": "gives an error"
     }
     
+@when("käyttäjä avaa sivun elokuvan lisäämiselle")
+def open_add_movie(context):
+    context.response = context.client.get("/tips/add-movie")
+
+@when("käyttäjä täyttää elokuvan lomakkeen oikein")
+def user_fills_movie_form_correctly(context):
+    context.path = "/tips/add-movie"
+    context.form_data = {
+        "title": "some movie",
+        "director": "test director",
+        "publication_year": 2019,
+        "lengthInSeconds": 8024,
+        "comment": "test comment"
+    }
+
+@when("käyttäjä täyttää elokuvan lomakkeen väärin")
+def user_fills_movie_form_wrong(context):
+    context.path = "/tips/add-movie"
+    context.form_data = {
+        "title": "title exists but missing director",
+        "comment": "gives and error"
+    }
+
 @when("käyttäjä lähettää lomakkeen")
 def user_sends_form(context):
     context.response = context.client.post(context.path, data=context.form_data)
@@ -117,7 +140,7 @@ def tips_remove(context):
 @then("käyttäjä näkee vinkkilistan, josta on poistettu yksi vinkki")
 def user_sees_list(context):
     allTipsAfterDelete = Tip.query.all()
-    assert len(allTipsAfterDelete) == 2
+    assert len(allTipsAfterDelete) == 3
 
 @then("käyttäjä näkee vinkkilistan")
 def user_sees_list(context):
@@ -239,6 +262,39 @@ def invalid_modified_audiobook_is_not_found(context):
     unmodified_audiobook = audiobooks[0]
     assert unmodified_audiobook.title == "Python Programming: The Ultimate Beginner's Guide to Master Python Programming Step by Step with Practical Exercices"
 
+@then("käyttäjä näkee oikeanlaisen elokuvan formin")
+def movie_form_is_right(context):
+    page = make_soup(context.response.data)
+
+    assert 6 == len(page.find_all('input'))
+    assert 1 == len(page.find_all('textarea'))
+    assert "Otsikko" in page.text
+    assert "Ohjaaja" in page.text
+    assert "Julkaisuvuosi" in page.text
+    assert "Pituus" in page.text
+    assert "Liittyvät kurssit" in page.text
+    assert "Tunnisteet" in page.text
+    assert "Oma kommentti" in page.text
+
+@then("elokuva lisätään vinkkeihin")
+def movie_is_added_to_list(context):
+    movies = Movie.query.filter_by(title=context.form_data['title']).all()
+
+    assert len(movies) == 1
+    new_movie = movies[0]
+    assert new_movie.title == context.form_data['title']
+    assert new_movie.director == context.form_data['director']
+    assert new_movie.publication_year == context.form_data['publication_year']
+    assert new_movie.lengthInSeconds == context.form_data['lengthInSeconds']
+    assert new_movie.comment == context.form_data['comment']
+
+@then("elokuvaa ei lisätä vinkkeihin")
+def movie_is_not_added_to_list(context):
+    movies = Movie.query.filter_by(title=context.form_data['title']).all()
+
+    assert len(movies) == 0
+
+
 @when("käyttäjä avaa vinkkisivun")
 def step_impl(context):
     context.response = context.client.get("/")
@@ -248,6 +304,11 @@ def step_impl(context):
 def step_impl(context, filter, value):
     context.response = context.client.get(f"/?{filter}={value}")
 
+
+@when('hakee ehtojen "{filter1}" ja "{filter2}" arvoilla "{value1}" ja "{value2}"')
+def step_impl(context, filter1, filter2, value1, value2):
+    context.response = context.client.get(
+        f"/?{filter1}={value1}&{filter2}={value2}")
 
 @then('ainoastaan vinkki "{text}" näkyy')
 def step_impl(context, text):
@@ -260,4 +321,4 @@ def step_impl(context, text):
 @then("kaikki vinkit näkyvät")
 def step_impl(context):
     page = make_soup(context.response.data)
-    assert len(page.find_all(class_="card-body")) == 3
+    assert len(page.find_all(class_="card-body")) == 4
