@@ -9,6 +9,8 @@ from tests.util import make_soup, reset_database
 def step_impl(context):
     reset_database()
 
+# Kirjaan liittyvät tapaukset
+
 @when("käyttäjä avaa sivun kirjan lisäämiselle")
 def open_add_book(context):
     context.response = context.client.get("/tips/add-book")
@@ -33,6 +35,8 @@ def user_fills_book_form_incorrectly(context):
         "comment": ""
     }
 
+# Videoon liittyvät tapaukset
+
 @when("käyttäjä avaa sivun videon lisäämiselle")
 def open_add_book(context):
     path = "/tips/add-video"
@@ -56,6 +60,25 @@ def user_fills_video_form_wrong(context):
         "upload_date": '2020-12-01',
         "comment": "test comment"
     }
+
+@when("käyttäjä avaa sivun videon muokkaamiselle")
+def open_edit_video(context):
+    videos = Video.query.all()
+    context.path = "/tips/edit/" + str(videos[0].id) + "/"
+    context.response = context.client.get(context.path)
+
+@when("käyttäjä täyttää videon muokkauslomakkeen oikein")
+def user_fills_video_edit_form_correctly(context):
+    videos = Video.query.all()
+    context.path = "/tips/edit/video/" + str(videos[0].id) + "/"
+    context.form_data = {
+        "title": "modified video",
+        "source": "www.modified.com",
+        "upload_date": '2020-12-01',
+        "comment": "test comment"
+    }
+
+# Äänikirjaan liittyvät tapaukset
 
 @when("käyttäjä avaa sivun äänikirjan lisäämiselle")
 def open_add_audiobook(context):
@@ -110,6 +133,8 @@ def user_fills_audiobook_edits_wrong(context):
         "narrator": "but missing author",
         "comment": "gives an error"
     }
+
+# Elokuvaan liittyvät tapaukset
     
 @when("käyttäjä avaa sivun elokuvan lisäämiselle")
 def open_add_movie(context):
@@ -134,6 +159,8 @@ def user_fills_movie_form_wrong(context):
         "comment": "gives and error"
     }
 
+# Luettu statukseen, poistoon ja vinkkien esitykseen liittyvät tapaukset
+
 @when("käyttäjä lähettää lomakkeen")
 def user_sends_form(context):
     context.response = context.client.post(context.path, data=context.form_data)
@@ -145,7 +172,6 @@ def user_(context):
     path = '/tips/change_read/' + firstId
     context.response = context.client.post(path)
     context.id = firstId
-
 
 @when("käyttäjä avaa vinkkilista sivun")
 def open_tips(context):
@@ -185,6 +211,7 @@ def user_sees_that_tip_is_read(context):
      tip = soup.find(id=context.id)
      assert "Ei" in soup.text
 
+# Kirjaan liittyvät tapaukset
 
 @then("käyttäjä näkee oikeanlaisen kirja formin")
 def form_is_right(context):
@@ -212,6 +239,8 @@ def incorrectly_modified_book_is_not_found(context):
     books = Book.query.all()
     unmodified_book = books[0]
     assert unmodified_book.title == "Clean Code: A Handbook of Agile Software Craftsmanship"
+
+# Videoon liittyvät tapaukset
 
 @then("käyttäjä näkee oikeanlaisen video formin")
 def form_is_right(context):
@@ -241,6 +270,23 @@ def tip_is_not_added_to_list(context):
     videos = Video.query.filter_by(title=context.form_data['title']).all()
 
     assert len(videos) == 0
+
+@then("muokattu video löytyy vinkeistä")
+def video_is_updated(context):
+    videos = Video.query.all()
+    assert len(videos) == 1
+    modified_video = videos[0]
+    assert modified_video.title == context.form_data['title']
+    assert modified_video.comment == context.form_data['comment']
+
+
+@then("video ei muokkaannu")
+def incorrectly_modified_book_is_not_found(context):
+    videos = Video.query.all()
+    unmodified_video = videos[0]
+    assert unmodified_video.title == "Merge sort algorithm"
+
+# Äänikirjaan liittyvät tapaukset
 
 @then("käyttäjä näkee oikeanlaisen äänikirjan formin")
 def audiobook_form_is_right(context):
@@ -296,6 +342,8 @@ def invalid_modified_audiobook_is_not_found(context):
     unmodified_audiobook = audiobooks[0]
     assert unmodified_audiobook.title == "Python Programming: The Ultimate Beginner's Guide to Master Python Programming Step by Step with Practical Exercices"
 
+# Elokuvaan liittyvät tapaukset
+
 @then("käyttäjä näkee oikeanlaisen elokuvan formin")
 def movie_form_is_right(context):
     page = make_soup(context.response.data)
@@ -328,11 +376,11 @@ def movie_is_not_added_to_list(context):
 
     assert len(movies) == 0
 
+# Hakuun liittyvät tapaukset
 
 @when("käyttäjä avaa vinkkisivun")
 def step_impl(context):
     context.response = context.client.get("/")
-
 
 @when('hakee ehdon "{filter}" arvolla "{value}"')
 def step_impl(context, filter, value):
@@ -356,3 +404,4 @@ def step_impl(context, text):
 def step_impl(context):
     page = make_soup(context.response.data)
     assert len(page.find_all(class_="card-body")) == 4
+
