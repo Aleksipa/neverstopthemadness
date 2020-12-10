@@ -13,6 +13,26 @@ def step_impl(context):
 def open_add_book(context):
     context.response = context.client.get("/tips/add-book")
 
+@when("käyttäjä täyttää kirjan muokkauslomakkeen oikein")
+def user_fills_book_form_correctly(context):
+    books = Book.query.all()
+    context.path = "/tips/edit_book_tip" + str(books[0].id) + "/"
+    context.form_data = {
+        "title": "some book",
+        "author": "some author",
+        "comment": "some comment"
+    }
+
+@when("käyttäjä täyttää kirjan muokkauslomakkeen väärin")
+def user_fills_book_form_incorrectly(context):
+    book = Book.query.all()
+    context.path = "/tips/edit_book_tip" + str(book[0].id) + "/"
+    context.form_data = {
+        "title": "",
+        "author": "",
+        "comment": ""
+    }
+
 @when("käyttäjä avaa sivun videon lisäämiselle")
 def open_add_book(context):
     path = "/tips/add-video"
@@ -178,6 +198,20 @@ def form_is_right(context):
     assert "ISBN" in page.text
     assert "Sivuja" in page.text
     assert "Oma kommentti" in page.text
+
+@then("muokattu kirja löytyy vinkeistä")
+def valid_modified_audiobook_is_found(context):
+    books = Book.query.all()
+    modified_book = books[0]
+    assert modified_book.title == context.form_data['some book']
+    assert modified_book.author == context.form_data['some author']
+    assert modified_book.comment == context.form_data['some comment']
+
+@then("muokattua kirjaa ei löydy vinkeistä")
+def incorrectly_modified_book_is_not_found(context):
+    books = Book.query.all()
+    unmodified_book = books[0]
+    assert unmodified_book.title == "Clean Code: A Handbook of Agile Software Craftsmanship"
 
 @then("käyttäjä näkee oikeanlaisen video formin")
 def form_is_right(context):

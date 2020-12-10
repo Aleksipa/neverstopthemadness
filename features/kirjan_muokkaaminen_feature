@@ -1,0 +1,20 @@
+# language: fi
+
+Ominaisuus: Käyttäjä pystyy muokkaamaan kirjaa
+
+    Tapaus: Käyttäjä menee muokkamaan kirjaa
+        Oletetaan että ollaan lähtötilanteessa
+        Kun       käyttäjä avaa sivun kirjan lisäämiselle
+        Niin      käyttäjä näkee oikeanlaisen kirja formin
+
+    Tapaus: Käyttäjä lisää validin muutoksen kirjaan
+        Oletetaan että ollaan lähtötilanteessa
+        Kun       käyttäjä täyttää kirjan muokkauslomakkeen oikein
+        Ja        käyttäjä lähettää lomakkeen
+        Niin      muokattu kirja löytyy vinkeistä
+
+    Tapaus: Käyttäjä lisää epävalidin muutoksen kirjaan
+        Oletetaan että ollaan lähtötilanteessa
+        Kun       käyttäjä täyttää kirjan muokkauslomakkeen väärin
+        Ja        käyttäjä lähettää lomakkeen
+        Niin      muokattua kirjaa ei löydy vinkeistä
