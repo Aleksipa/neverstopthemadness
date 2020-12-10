@@ -222,3 +222,9 @@ def test_successful_edit_video(client):
     assert len(edited_video) == 1
     assert edited_video[0].title == "edited video"
     assert edited_video[0].comment == "test comment"
+
+def test_successful_remove_tip(client):
+    allTips = Tip.query.all()
+    resp = client.delete("/tips_remove/" + str(allTips[0].id))
+    assert resp.status_code == 302
+    assert Book.query.filter_by(title="edited book").count() == 0
