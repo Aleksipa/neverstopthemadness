@@ -2,7 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import true
 
 from application import db
-
+from math import floor, ceil
 
 class Tip(db.Model):
     __tablename__ = "Tip"
@@ -131,6 +131,16 @@ class Audiobook(Tip):
     publication_year = db.Column(db.Integer)
     isbn = db.Column(db.Text)
     lengthInSeconds = db.Column(db.Integer)
+
+    def display_length(self):
+        hours = floor( self.lengthInSeconds / 3600 )
+        remaining = self.lengthInSeconds - ( hours * 3600 )
+        minutes = ceil(remaining / 60.0)
+        
+        if hours == 0:
+            return "{} min".format(minutes)
+            
+        return "{} h {} min".format(hours, minutes)
 
 class Movie(Tip):
     __tablename__ = "Movie"
