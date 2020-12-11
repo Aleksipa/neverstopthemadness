@@ -20,7 +20,6 @@ Definition of Done:
 - Code has unit testing
 - Code has user level testing if applicable
 - Code passes tests
-- Changes have been documented to this readme.md
 - Code has been integrated to app, and app still passes all tests
 - Code has been pushed to Heroku and is part of the accessible app
 
