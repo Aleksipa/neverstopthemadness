@@ -162,6 +162,9 @@ def tips_editform(tip_id):
     elif tip_to_edit.type == "Audiobook":
         form = AddAudiobookForm(formdata=request.form, obj=tip_to_edit)
         return render_template("edit_audiobook.html", form=form, tip_id=tip_id)
+    elif tip_to_edit.type == "Movie":
+        form = AddMovieForm(formdata=request.form, obj=tip_to_edit)
+        return render_template("edit_movie.html", form=form, tip_id=tip_id)
     else:
         form = AddVideoForm(formdata=request.form, obj=tip_to_edit)
         return render_template("edit_video.html", form=form, tip_id=tip_id)
