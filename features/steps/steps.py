@@ -159,6 +159,34 @@ def user_fills_movie_form_wrong(context):
         "comment": "gives and error"
     }
 
+@when("käyttäjä avaa sivun elokuvan muokkaamiselle")
+def open_edit_movie(context):
+    movies = Movie.query.all()
+    context.path = "/tips/edit/" + str(movies[0].id) + "/"
+    context.response = context.client.get(context.path)
+
+@when("käyttäjä täyttää elokuvan muokkauslomakkeen oikein")
+def user_fills_audiobook_edits_correctly(context):
+    movies = Movie.query.all()
+    context.path = "/tips/edit/movie/" + str(movies[0].id) + "/"
+    context.form_data = {
+        "title": "modified movie",
+        "director": "modified director",
+        "publication_year": 2019,
+        "lengthInSeconds": 8024,
+        "comment": "test comment"
+    }
+
+@when("käyttäjä täyttää elokuvan muokkauslomakkeen väärin")
+def user_fills_audiobook_edits_wrong(context):
+    movies = Movie.query.all()
+    context.path = "/tips/edit/movie/" + str(movies[0].id) + "/"
+    context.form_data = {
+        "title": "",
+        "narrator": "",
+        "comment": ""
+    }
+
 # Luettu statukseen, poistoon ja vinkkien esitykseen liittyvät tapaukset
 
 @when("käyttäjä lähettää lomakkeen")
@@ -191,13 +219,11 @@ def user_sees_list(context):
 @then("käyttäjä näkee vinkkilistan")
 def user_sees_list(context):
      soup = make_soup(context.response.data)
-     
      assert "Clean Code: A Handbook of Agile Software Craftsmanship" in soup.text
      assert "Merge sort algorithm" in soup.text
 
 @then("käyttäjä näkee vinkkilistan, jossa vinkki on merkitty luetuksi")
 def user_sees_that_tip_is_read(context):
-     
      resp = context.client.get("/")
      soup = make_soup(resp.data)
      tip = soup.find(id=context.id)
@@ -205,7 +231,6 @@ def user_sees_that_tip_is_read(context):
 
 @then("käyttäjä näkee vinkkilistan, jossa vinkki on merkitty lukemattomaksi")
 def user_sees_that_tip_is_read(context):
-     
      resp = context.client.get("/")
      soup = make_soup(resp.data)
      tip = soup.find(id=context.id)
@@ -216,7 +241,6 @@ def user_sees_that_tip_is_read(context):
 @then("käyttäjä näkee oikeanlaisen kirja formin")
 def form_is_right(context):
     page = make_soup(context.response.data)
-
     assert 6 == len(page.find_all('input'))
     assert 1 == len(page.find_all('textarea'))
     assert "Otsikko" in page.text
@@ -245,7 +269,6 @@ def incorrectly_modified_book_is_not_found(context):
 @then("käyttäjä näkee oikeanlaisen video formin")
 def form_is_right(context):
     page = make_soup(context.response.data)
-
     assert 5 == len(page.find_all('input'))
     assert 1 == len(page.find_all('textarea'))
     assert "Otsikko" in page.text
@@ -258,7 +281,6 @@ def form_is_right(context):
 @then("video lisätään vinkkeihin")
 def tip_is_added_to_list(context):
     videos = Video.query.filter_by(title=context.form_data['title']).all()
-
     assert len(videos) == 1
     new_video = videos[0]
     assert new_video.title == context.form_data['title']
@@ -268,7 +290,6 @@ def tip_is_added_to_list(context):
 @then("videota ei lisätä vinkkeihin")
 def tip_is_not_added_to_list(context):
     videos = Video.query.filter_by(title=context.form_data['title']).all()
-
     assert len(videos) == 0
 
 @then("muokattu video löytyy vinkeistä")
@@ -291,7 +312,6 @@ def incorrectly_modified_book_is_not_found(context):
 @then("käyttäjä näkee oikeanlaisen äänikirjan formin")
 def audiobook_form_is_right(context):
     page = make_soup(context.response.data)
-
     assert 8 == len(page.find_all('input'))
     assert 1 == len(page.find_all('textarea'))
     assert "Otsikko" in page.text
@@ -347,21 +367,29 @@ def invalid_modified_audiobook_is_not_found(context):
 @then("käyttäjä näkee oikeanlaisen elokuvan formin")
 def movie_form_is_right(context):
     page = make_soup(context.response.data)
-
     assert 6 == len(page.find_all('input'))
     assert 1 == len(page.find_all('textarea'))
     assert "Otsikko" in page.text
     assert "Ohjaaja" in page.text
     assert "Julkaisuvuosi" in page.text
     assert "Pituus" in page.text
-    assert "Liittyvät kurssit" in page.text
+    assert "Tunnisteet" in page.text
+    assert "Oma kommentti" in page.text
+
+@then("käyttäjä näkee oikeanlaisen elokuvan muokkaus formin")
+def movie_edit_form_is_right(context):
+    page = make_soup(context.response.data)
+
+    assert "Otsikko" in page.text
+    assert "Ohjaaja" in page.text
+    assert "Julkaisuvuosi" in page.text
+    assert "Pituus" in page.text
     assert "Tunnisteet" in page.text
     assert "Oma kommentti" in page.text
 
 @then("elokuva lisätään vinkkeihin")
 def movie_is_added_to_list(context):
     movies = Movie.query.filter_by(title=context.form_data['title']).all()
-
     assert len(movies) == 1
     new_movie = movies[0]
     assert new_movie.title == context.form_data['title']
@@ -373,8 +401,26 @@ def movie_is_added_to_list(context):
 @then("elokuvaa ei lisätä vinkkeihin")
 def movie_is_not_added_to_list(context):
     movies = Movie.query.filter_by(title=context.form_data['title']).all()
-
     assert len(movies) == 0
+
+@then("muokattu elokuva löytyy vinkeistä")
+def valid_modified_movie_is_found(context):
+    movies = Movie.query.all()
+    assert len(movies) == 1
+    modified_movie = movies[0]
+    assert modified_movie.title == context.form_data['title']
+    assert modified_movie.director == context.form_data['director']
+    assert modified_movie.publication_year == context.form_data['publication_year']
+    assert modified_movie.lengthInSeconds == context.form_data['lengthInSeconds']
+    assert modified_movie.comment == context.form_data['comment']
+
+@then("elokuva ei muokkaannu")
+def invalid_modified_movie_is_not_found(context):
+    movies = Movie.query.all()
+    assert len(movies) == 1
+    unmodified_movie = movies[0]
+    print(unmodified_movie.title)
+    assert unmodified_movie.title == "Monthy Python and the Holy Grail"
 
 # Hakuun liittyvät tapaukset
 
