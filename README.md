@@ -13,6 +13,8 @@ App can be tested at [lukuvinkkisovellus.herokuapp.com](https://lukuvinkkisovell
 
 Test coverage report can be found [here](https://codecov.io/gh/Aleksipa/Lukuvinkkisovellus).
 
+Project report can be found [here](https://docs.google.com/document/d/1gl12Ryy5ZCvcsUaMExCYpzN_GXq_JrAC1F4LCsTcJP4/edit?usp=sharing).
+
 ## Developing
 
 Definition of Done:
