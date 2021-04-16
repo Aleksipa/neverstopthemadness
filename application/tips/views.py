@@ -133,9 +133,9 @@ def add():
 @app.route("/tips_remove/<tip_id>", methods=["DELETE", "GET"])
 def tips_remove(tip_id):
 
-    tip_to_delete = Tip.query.get_or_404(tip_id)
+    tip_to_remove = Tip.query.get_or_404(tip_id)
 
-    db.session().delete(tip_to_delete)
+    db.session().delete(tip_to_remove)
     db.session().commit()
 
     return redirect(url_for("get_tips"))
