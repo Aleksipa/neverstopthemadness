@@ -11,14 +11,14 @@ from application.tips.forms import AddBookForm, AddVideoForm, AddAudiobookForm, 
 
 
 def compute_search_criteria_fields():
-    choices = []
+    validation = []
     for key, desc in searchable_fields.items():
-        choices.append({
+        validation.append({
             "name": desc.display_name,
             "value": key,
         })
-    choices.sort(key=lambda x: x["name"])
-    return choices
+    validation.sort(key=lambda x: x["name"])
+    return validation
 
 
 search_criteria_fields = compute_search_criteria_fields()
